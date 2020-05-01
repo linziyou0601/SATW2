@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html 
+    xmlns:th="http://www.thymeleaf.org" 
+    xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout" 
+    layout:decorator="~{/layouts/base}"
+    th:with="currentPage='myProducts',navType='subNav'"
+>
+    <head>
+        <title>My Products</title>
+    </head>
+    <body>
+        <div layout:fragment="content">
+            <section class="page-section" style="min-height: calc(100vh - 96px);">
+                <div class="container">
+                    <h2 class="text-center mt-0">My Products</h2>
+                    <hr class="divider my-4">
+
+                    <div class="row justify-content-center">
+                        <div class="mx-1 mx-sm-2" th:each="product: ${products}" style="width:160px;">
+                            <a th:href="@{/myProducts/} + ${product.id}" class="text-decoration-none">
+                                <div class="card o-hidden my-2 rounded shadow-sm border border-right">
+                                    <div class="card-body p-0">
+                                        <div class="row justify-content-center align-items-center text-center">
+                                            <div th:style="'width:160px; height:160px; background: url('+${product.imgs}+') no-repeat center center; background-size: cover;'"></div>
+
+                                        </div>
+                                        <div class="row justify-content-center align-items-center text-center px-4 mt-2">
+                                            <span style="font-size:1.2rem" class="font-weight-bold" th:text="${product.title}"></span>
+                                        </div>
+                                        <div class="row justify-content-center align-items-center text-center px-4 my-2">
+                                            <div class="col-7 px-1 py-1 text-left">
+                                                <span style="font-size:1rem" class="text-danger">$ </span>
+                                                <span style="font-size:1.2rem" class="text-danger font-weight-bold" th:text="${product.price}"></span>
+                                            </div>
+                                            <div class="col-5 px-1 py-1 text-right">
+                                                <span style="font-size:1rem" th:text="'('+${product.stockQty}+')'"></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+
+                    <button type="button" class="btn btn-danger shadow btn-circle btn-xl actionCircleButton" data-toggle="modal" data-target="#createProduct"><i class="fa fa-plus"></i></button>
+                </div>
+            </section>
+
+            <!-- CREATE PRODUCT MODAL -->
+            <div id="createProduct" class="modal fade" tabindex="-1" role="dialog">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <form method="POST" enctype="multipart/form-data" id="createProductForm">
+                            <div class="modal-header">
+                                <h5 class="modal-title">Create Product</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="form-group">
+                                    <label for="title">Title</label>
+                                    <input class="form-control rounded-pill form-control-lg" placeholder="title" type="text" name="title" autofocus="" required=""/>
+                                </div>
+                                <div class="form-group">
+                                    <label for="description">Description</label>
+                                    <textarea class="form-control form-control-lg" placeholder="description" type="text" name="description" autofocus="" rows="3"></textarea>
+                                </div>
+                                <div class="form-group">
+                                    <label for="price">Price</label>
+                                    <input class="form-control rounded-pill form-control-lg" placeholder="price" type="number" name="price" min="1" autofocus="" required=""/>
+                                </div>
+                                <div class="form-group">
+                                    <label for="stockQty">Stock Quantity</label>
+                                    <input class="form-control rounded-pill form-control-lg" placeholder="stock quantity" type="number" name="stockQty" min="0" autofocus="" required=""/>
+                                </div>
+                                <div class="custom-file">
+                                    <input type="file" name="files" id="inputFile" class="custom-file-input form-control-lg" accept="image/*"/>
+                                    <label class="custom-file-label form-control-lg" for="inputFile" data-browse="choose">product image</label>
+                                </div>
+                                <!-- 照片預覽 -->
+                                <div class="col-12">
+                                    <div class="mx-auto p-4">
+                                        <div class="text-center">
+                                            <img id="picture" th:src="@{/images/product_img.png}" name="picture" alt="photo" class="img-fluid"/>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="submit" value="Submit" id="createBtn" class="btn btn-blue">Create</button>
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <div layout:fragment="customJs" th:inline="javascript">
+            <script>
+                $(function(){
+                    $("#createBtn").click(function (event) {
+                        event.preventDefault();
+                        if($("input[name='title']").val()=="" || $("input[name='price']").val()=="" || $("input[name='stockQty']").val()==""){
+                            Swal.fire("Failed", "Please check if the field is fill.", "warning");
+                        } else {
+                            create(); 
+                        }
+                    });
+                    
+                    function create() {
+                        $('#loading').modal('show');
+                        $('#loading').on('shown.bs.modal', function (event) {
+                            var modal = $(this);
+                            // 取得form
+                            var form = $('#createProductForm')[0];
+                            var data = new FormData(form);
+                            
+                            $("#createBtn").prop("disabled", true);
+                            $.ajax({
+                                type: "POST",               //使用POST傳輸,檔案上傳只能用POST
+                                enctype: 'multipart/form-data', //將資料加密傳輸 檔案上傳一定要有的屬性
+                                url: "/myProducts/create", //要傳輸對應的接口
+                                data: data,         //要傳輸的資料,我們將form 內upload打包成data
+                                processData: false, //防止jquery將data變成query String
+                                contentType: false, 
+                                cache: false,  //不做快取
+                                async : false  //設為同步
+                            }).done(function(response) {
+                                modal.off('shown.bs.modal');
+                                modal.modal("hide");
+                                $("#createBtn").prop("disabled", false);
+                                Swal.fire(response['title'], response['text'], response['icon']).then(
+                                    function () {
+                                        if(response['title']=="Successful") location.href = [[@{/myProducts}]];
+                                    }
+                                );
+                            })
+                        })
+                        
+                    }
+
+                    //選擇檔案時
+                    $("#inputFile").change(function(event) { 
+                        readURL(this);
+                    });
+
+                    //讀取圖片
+                    function readURL(input) {
+                        if (input.files && input.files[0]) {
+                            //取得檔案閱讀器
+                            let reader = new FileReader();
+                            //驗證檔案大小
+                            if(input.files[0].size > 10485760){//input.files[0].size > 5242880‬){
+                                Swal.fire("Failed", "Picture size do not exceed 10MB", "warning");
+                                $('input[name="files"]').val('');
+                                resetURL();
+                                return false;
+                            }
+                            //取得檔名
+                            let filename = input.files[0].name;
+                            filename = filename.substring(filename.lastIndexOf('\\')+1);
+                            //手機端圖片轉向
+                            var orientation;
+                            EXIF.getData(input.files[0], function(){
+                                orientation = EXIF.getTag(this,'Orientation');  //EXIF js：  https://github.com/exif-js/exif-js
+                            });
+                            //圖片載入完成後
+                            reader.onload = function(e) {   
+                                //取得轉向後的 Base64 url
+                                getImgData(this.result, orientation, function(data){
+                                    $('#picture').prop('src', data);
+                                }); 
+                                $('#picture').hide().fadeIn(500);
+                                $('#inputFile~.custom-file-label').text(filename);
+                            }
+                            reader.readAsDataURL(input.files[0]);
+                        } else {
+                            resetURL();
+                        }
+                    }
+                    //讀取圖片轉向後的 Base64 url
+                    function getImgData(img, orientation, nextFunc){
+                        var image = new Image();
+                        image.onload=function(){
+                            var degree = 0, drawWidth, drawHeight, width, height;
+                            drawWidth = this.naturalWidth;                  //取得圖片寬
+                            drawHeight = this.naturalHeight;                //取得圖片高
+
+                            var canvas = document.createElement('canvas');
+                            canvas.width = width = drawWidth;               //設定寬
+                            canvas.height = height = drawHeight;            //設定高
+
+                            var context = canvas.getContext('2d');
+
+                            //判斷圖片方向、重置canvas大小、確定旋轉角度（預設是home鍵在右方的橫拍模式）
+                            switch(orientation){
+                                //此時home鍵在左
+                                case 3:
+                                    degree = 180;
+                                    drawWidth = -width;
+                                    drawHeight = -height;
+                                    break;
+                                //此時home鍵在下
+                                case 6:
+                                    canvas.width = height;
+                                    canvas.height = width;
+                                    degree = 90;
+                                    drawWidth = width;
+                                    drawHeight = -height;
+                                    break;
+                                //此時home鍵在上
+                                case 8:
+                                    canvas.width = height;
+                                    canvas.height = width; 
+                                    degree = 270;
+                                    drawWidth = -width;
+                                    drawHeight = height;
+                                    break;
+                            }
+                            //旋轉並繪圖
+                            context.rotate(degree * Math.PI / 180);                 //以左上角為圓心旋轉
+                            context.drawImage(this, 0, 0, drawWidth, drawHeight);   //drawImage(繪圖源, 擷取x自, 擷取y自, 擷取x至, 擷取y至)
+                            //回傳圖片base64給下個function
+                            nextFunc(canvas.toDataURL("image/jpeg",.8));
+                        }
+                        image.src = img;    //讀圖
+                    }
+
+                    //上傳失敗，還原圖片
+                    function resetURL(){
+                        var originalPath = [[@{/images/product_img.png}]];
+                        $('#picture').attr('src', originalPath);
+                        $('#picture').hide().fadeIn(500);
+                        $('#inputFile~.custom-file-label').text('product image (max 10MB)');
+                    }
+                })
+            </script>
+        </div>
+    </body>
+</html>

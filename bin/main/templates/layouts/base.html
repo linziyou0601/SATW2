@@ -1,0 +1,256 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        <meta name="description" content="">
+        <meta name="author" content="">
+        <title layout:title-pattern="$CONTENT_TITLE - $LAYOUT_TITLE">SA TW2</title>
+        <!-- Google Fonts -->
+        <link href="https://fonts.googleapis.com/earlyaccess/notosanstc.css" rel="stylesheet">
+        <link href='https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i,800,800i' rel='stylesheet' type='text/css'>
+        <!--Font Awesome-->
+	    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css">
+        <!-- Theme CSS - Includes Bootstrap & Bootstrap Datepicker & Bootstrap Table Editable & Bootstrap Select-->
+        <link th:href="@{/css/creative.css}" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker.css">
+        <link rel="stylesheet" href="https://unpkg.com/bootstrap-table@1.16.0/dist/bootstrap-table.min.css">
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/TableExport/5.2.0/css/tableexport.css" rel="stylesheet" />
+        <link href="https://cdn.jsdelivr.net/gh/Talv/x-editable@develop/dist/bootstrap4-editable/css/bootstrap-editable.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-select@1.13.9/dist/css/bootstrap-select.min.css">
+        <style>
+            .datepicker > div { 
+                display: inherit; 
+            }
+            @media (min-width: 992px) {
+                .col-lg-border-right:not(:last-child) {
+                    border-right: 1px solid #d7d7d7;
+                }
+            }
+            @media (min-width: 768px) and (max-width:991px) {
+                .col-md-border-right:not(:last-child) {
+                    border-right: 1px solid #d7d7d7;
+                }
+            }
+            @media (max-width:767px) {
+                .col-sm-border-bottom:not(:last-child) {
+                    border-bottom: 1px solid #d7d7d7;
+                }
+            }
+            .btn-circle.btn-xl {
+                width: 70px;
+                height: 70px;
+                padding: 10px 16px;
+                border-radius: 35px;
+                font-size: 24px;
+                line-height: 1.33;
+            }
+
+            .btn-circle {
+                width: 30px;
+                height: 30px;
+                padding: 6px 0px;
+                border-radius: 15px;
+                text-align: center;
+                font-size: 12px;
+                line-height: 1.42857;
+            }
+
+            .radio-tile-group .input-container .radio-button {
+                position: absolute;
+                opacity: 0;
+                height: 100%;
+                width: 100%;
+                cursor: pointer;
+            }
+            .radio-tile-group .input-container .radio-tile {
+                width: 100%;
+                height: 100%;
+                border: 1px solid #333;
+                border-radius: 5px;
+                padding: 1rem;
+                -webkit-transition: -webkit-transform 300ms ease;
+                transition: -webkit-transform 300ms ease;
+                transition: transform 300ms ease;
+                transition: transform 300ms ease, -webkit-transform 300ms ease;
+            }
+            .radio-tile-group .input-container .radio-button:checked + .radio-tile {
+                background-color: #333;
+                border: 2px solid #333;
+                color: white;
+                -webkit-transform: scale(1.05, 1.05);
+                    transform: scale(1.05, 1.05);
+            }
+            .actionCircleButton {
+                position: fixed;
+                right: 30px;
+                bottom:80px;
+            }
+            .orderState {
+                position: absolute;
+                top: 10px;
+                left:10px;
+            }
+            .home-form .inner-form{
+                box-shadow: 0px 8px 20px 0px rgba(0, 0, 0, 0.15);
+                border-radius: 34px;
+                margin-bottom: 30px;
+            }
+            .home-form .input-field{
+                height: 68px;
+            }
+            .home-form .inner-form .search-icon{
+                min-width: 80px;
+            }
+            .home-form .inner-form .btn-search{
+                transition: all .2s ease-out, color .2s ease-out;
+            }
+        </style>
+    </head>
+
+    <body id="page-top" style="background-color: #FCFCFC;">
+
+        <!-- Navigation -->
+        <nav class="navbar navbar-expand-lg navbar-light fixed-top py-3 text-center navbar-scrolled" th:id="${navType}">
+            <div class="container">
+                <a class="d-none d-lg-block navbar-brand js-scroll-trigger" th:href="@{/}">SATW2</a>
+                <form class="d-lg-none form-inline my-2 my-lg-0" method="GET" th:action="@{/products}">
+                    <input style="width: 200px;"class="form-control mr-sm-2 rounded-pill" type="search" placeholder="Search" aria-label="Search" name="key" th:value="${key!=null} ? ${key} : ''">
+                    <button class="btn btn-outline-secondary my-2 my-sm-0 rounded-circle" type="submit"><i class="fa fa-search"></i></button>
+                </form>
+                <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarResponsive">
+                    <ul class="navbar-nav my-2 my-lg-0 mr-4">
+                        <li class="nav-item">
+                            <a class="nav-link js-scroll-trigger" th:classappend="${currentPage == 'products'} ? 'active'" th:href="@{/products}">Products</a>
+                        </li>
+                    </ul>
+                    <form class="d-none d-lg-block form-inline my-2 my-lg-0 mr-auto" method="GET" th:action="@{/products}">
+                        <input class="form-control mr-sm-2 rounded-pill" type="search" placeholder="Search" aria-label="Search" name="key" th:value="${key!=null} ? ${key} : ''">
+                        <button class="btn btn-outline-secondary my-2 my-sm-0 rounded-circle" type="submit"><i class="fa fa-search"></i></button>
+                    </form>
+                    <div>
+                        <ul class="navbar-nav ml-auto my-2 my-lg-0">
+                            <li class="nav-item" th:if="${session.user}">
+                                <a class="nav-link js-scroll-trigger" th:classappend="${currentPage == 'myOrders'} ? 'active'" th:href="@{/myOrders}">MyOrders</a>
+                            </li>
+                            <li class="nav-item" th:if="${session.user}">
+                                <a class="nav-link js-scroll-trigger" th:classappend="${currentPage == 'myProducts'} ? 'active'" th:href="@{/myProducts}">MyProducts</a>
+                            </li>
+                            <li class="nav-item" th:if="${session.user}">
+                                <a class="nav-link js-scroll-trigger" th:classappend="${currentPage == 'wallet'} ? 'active'" th:href="@{/wallet}">Wallet</a>
+                            </li>
+                            <li class="nav-item" th:if="${session.user}">
+                                <a class="nav-link js-scroll-trigger" th:classappend="${currentPage == 'notification'} ? 'active'" th:href="@{/notification}">Notify</a>
+                            </li>
+                            <li class="nav-item" th:if="${session.user}">
+                                <a class="nav-link js-scroll-trigger" th:classappend="${currentPage == 'profile'} ? 'active'" th:href="@{/editProfile}" th:text="${session.user.account}"></a>
+                            </li>
+                            <li class="nav-item" th:if="${session.user}">
+                                <a class="nav-link js-scroll-trigger" th:href="@{/logout}">Logout</a>
+                            </li>
+                            <li class="nav-item" th:if="${session.user==null}">
+                                <a class="nav-link js-scroll-trigger" th:classappend="${currentPage == 'login'} ? 'active'" th:href="@{/login}">Login</a>
+                            </li>
+                            <li class="nav-item" th:if="${session.user==null}">
+                                <a class="nav-link js-scroll-trigger" th:classappend="${currentPage == 'register'} ? 'active'" th:href="@{/register}">Register</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </nav>
+        
+        <div layout:fragment="content" id="content" ></div>
+
+        <!-- LOADING MODAL -->
+        <div id="loading" class="modal fade" tabindex="-1" role="dialog" data-keyboard="false" data-backdrop="static">
+            <div class="modal-dialog modal-dialog-centered modal-sm" role="document">
+                <div class="modal-content">
+                    <div class="modal-body bg-dark">
+                        <div class="row justify-content-center align-items-center text-center px-4 pt-3">
+                            <div class="spinner-grow spinner-grow-sm text-secondary" role="status"></div>
+                            <div class="spinner-grow spinner-grow-sm text-success" role="status"></div>
+                            <div class="spinner-grow spinner-grow-sm text-danger" role="status"></div>
+                            <div class="spinner-grow spinner-grow-sm text-warning" role="status"></div>
+                            <div class="spinner-grow spinner-grow-sm text-info" role="status"></div>
+                            <div class="spinner-grow spinner-grow-sm text-light" role="status"></div>
+                        </div>
+                        <div class="row justify-content-center align-items-center text-center px-4 pb-3">          
+                            <span class="text-light">Loading...</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="bg-light py-5">
+            <div class="container">
+            <div class="small text-center text-muted">Copyright &copy; 2020 - SATW2</div>
+            </div>
+        </footer>
+        
+        <!-- Bootstrap CSS and JS -->
+        <script src="https://code.jquery.com/jquery-3.4.1.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-easing/1.4.1/jquery.easing.js"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.js"></script>
+        <!-- Bootstrap Table -->
+        <script src="https://unpkg.com/bootstrap-table@1.16.0/dist/bootstrap-table.js"></script>
+        <script src="https://unpkg.com/bootstrap-table@1.16.0/dist/bootstrap-table-locale-all.js"></script>
+        <!-- Bootstrap Table Export -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.15.1/xlsx.full.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/1.3.8/FileSaver.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/TableExport/5.2.0/js/tableexport.min.js"></script>
+        <!-- Bootstrap Datepicker -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/locales/bootstrap-datepicker.zh-TW.min.js"></script>
+        <!-- Bootstrap Table Editable -->
+        <script src="https://cdn.jsdelivr.net/gh/Talv/x-editable@develop/dist/bootstrap4-editable/js/bootstrap-editable.min.js"></script>
+        <script src="https://unpkg.com/bootstrap-table@1.15.4/dist/extensions/editable/bootstrap-table-editable.min.js"></script>
+        <!-- Bootstrap Select -->
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap-select@1.13.9/dist/js/bootstrap-select.min.js"></script>
+        <!-- Theme JS -->
+        <script th:src="@{/js/base.js}"></script>
+        <script th:src="@{/js/creative.js}"></script>
+        <script th:src="@{/js/exif-js.js}"></script>
+        <script th:src="@{/js/bootstrap-input-spinner.js}"></script>
+        <!-- Custom js -->
+
+
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2"></script>
+        <script src="https://cdn.jsdelivr.net/npm/promise-polyfill@7/dist/polyfill.min.js"></script>
+
+        <script type="text/javascript" th:if="${alert!=null}" th:inline="javascript">
+            Swal.fire({
+                title: [[${alert.title}]],
+                html: [[${alert.text}]],
+                showClass: {
+                    popup: 'swal2-show',
+                    backdrop: 'swal2-backdrop-show',
+                    icon: 'swal2-icon-show'
+                },
+                hideClass: {
+                    popup: 'swal2-hide',
+                    backdrop: 'swal2-backdrop-hide',
+                    icon: 'swal2-icon-hide'
+                },
+                showConfirmButton: [[${alert.showConfirmButton}]],
+                showCloseButton: [[${alert.showCloseButton}]],
+                icon: [[${alert.icon}]],
+                allowEscapeKey: [[${alert.allowEscapeKey}]],
+                allowOutsideClick: [[${alert.allowOutsideClick}]],
+                confirmButtonText: [[${alert.confirmButtonText}]],
+                confirmButtonColor: [[${alert.confirmButtonColor}]],
+                cancelButtonText: [[${alert.cancelButtonText}]],
+                cancelButtonColor: [[${alert.cancelButtonColor}]],
+            });
+        </script>
+
+        
+        <div layout:fragment="customJs" id="customJs" ></div>
+    </body>
+</html>

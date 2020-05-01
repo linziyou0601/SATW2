@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html 
+    xmlns:th="http://www.thymeleaf.org" 
+    xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout" 
+    layout:decorator="~{/layouts/base}"
+    th:with="currentPage='myProducts',navType='subNav'"
+>
+    <head>
+        <title>Edit Product</title>
+    </head>
+    <body>
+        <div layout:fragment="content">
+            <section class="page-section" id="info" style="min-height: calc(100vh - 96px);">
+                <div class="container">
+                    <h2 class="text-center mt-0">Edit Product</h2>
+                    <hr class="divider my-4">
+                    <div class="row justify-content-center">
+                        <div class="col-lg-6 col-md-8">
+                            <div class="card o-hidden border-0 shadow-lg my-3 rounded">
+                                <div class="card-body p-0">
+                                    <div class="p-5">
+
+                                        <form role="form" id="editProductForm" method="post" enctype="multipart/form-data" th:action="@{/myProducts/requestEditProduct}">
+                                            <div class="form-group">
+                                                <input type="number" name="id" autofocus="" th:value="${product.id}" hidden="" required=""/>
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="title">Title</label>
+                                                <input class="form-control rounded-pill form-control-lg" placeholder="title" type="text" name="title" autofocus="" th:value="${product.title}" required=""/>
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="description">Description</label>
+                                                <textarea class="form-control form-control-lg" placeholder="description" type="text" name="description" autofocus="" rows="3" th:text="${product.description}"></textarea>
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="price">Price</label>
+                                                <input class="form-control rounded-pill form-control-lg" placeholder="price" type="number" name="price" min="1" autofocus="" th:value="${product.price}" required=""/>
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="stockQty">Stock Quantity</label>
+                                                <input class="form-control rounded-pill form-control-lg" placeholder="stock quantity" type="number" name="stockQty" min="0" autofocus="" th:value="${product.stockQty}" required=""/>
+                                            </div>
+                                            <div class="custom-file">
+                                                <input type="file" name="files" id="inputFile" class="custom-file-input form-control-lg" accept="image/*"/>
+                                                <label class="custom-file-label form-control-lg" for="inputFile" data-browse="choose">product image (max 10MB)</label>
+                                            </div>
+                                            <!-- 照片預覽 -->
+                                            <div class="col-12">
+                                                <div class="mx-auto p-4">
+                                                    <div class="text-center">
+                                                        <img id="picture" th:src="${product.imgs}" name="picture" alt="photo" class="img-fluid"/>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <button type="submit" class="btn btn-primary btn-block rounded-pill form-control-lg mt-3">Save</button>
+                                        </form>
+                                        
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <div layout:fragment="customJs" th:inline="javascript">
+            <script>
+                $(function(){
+                    //選擇檔案時
+                    $("#inputFile").change(function(event) { 
+                        readURL(this);
+                    });
+
+                    //讀取圖片
+                    function readURL(input) {
+                        if (input.files && input.files[0]) {
+                            //取得檔案閱讀器
+                            let reader = new FileReader();
+                            //驗證檔案大小
+                            if(input.files[0].size > 10485760){//input.files[0].size > 5242880‬){
+                                Swal.fire("Failed", "Picture size do not exceed 10MB", "warning");
+                                $('input[name="files"]').val('');
+                                resetURL();
+                                return false;
+                            }
+                            //取得檔名
+                            let filename = input.files[0].name;
+                            filename = filename.substring(filename.lastIndexOf('\\')+1);
+                            //手機端圖片轉向
+                            var orientation;
+                            EXIF.getData(input.files[0], function(){
+                                orientation = EXIF.getTag(this,'Orientation');  //EXIF js：  https://github.com/exif-js/exif-js
+                            });
+                            //圖片載入完成後
+                            reader.onload = function(e) {   
+                                //取得轉向後的 Base64 url
+                                getImgData(this.result, orientation, function(data){
+                                    $('#picture').prop('src', data);
+                                }); 
+                                $('#picture').hide().fadeIn(500);
+                                $('#inputFile~.custom-file-label').text(filename);
+                            }
+                            reader.readAsDataURL(input.files[0]);
+                        } else {
+                            resetURL();
+                        }
+                    }
+                    //讀取圖片轉向後的 Base64 url
+                    function getImgData(img, orientation, nextFunc){
+                        var image = new Image();
+                        image.onload=function(){
+                            var degree = 0, drawWidth, drawHeight, width, height;
+                            drawWidth = this.naturalWidth;                  //取得圖片寬
+                            drawHeight = this.naturalHeight;                //取得圖片高
+
+                            var canvas = document.createElement('canvas');
+                            canvas.width = width = drawWidth;               //設定寬
+                            canvas.height = height = drawHeight;            //設定高
+
+                            var context = canvas.getContext('2d');
+
+                            //判斷圖片方向、重置canvas大小、確定旋轉角度（預設是home鍵在右方的橫拍模式）
+                            switch(orientation){
+                                //此時home鍵在左
+                                case 3:
+                                    degree = 180;
+                                    drawWidth = -width;
+                                    drawHeight = -height;
+                                    break;
+                                //此時home鍵在下
+                                case 6:
+                                    canvas.width = height;
+                                    canvas.height = width;
+                                    degree = 90;
+                                    drawWidth = width;
+                                    drawHeight = -height;
+                                    break;
+                                //此時home鍵在上
+                                case 8:
+                                    canvas.width = height;
+                                    canvas.height = width; 
+                                    degree = 270;
+                                    drawWidth = -width;
+                                    drawHeight = height;
+                                    break;
+                            }
+                            //旋轉並繪圖
+                            context.rotate(degree * Math.PI / 180);                 //以左上角為圓心旋轉
+                            context.drawImage(this, 0, 0, drawWidth, drawHeight);   //drawImage(繪圖源, 擷取x自, 擷取y自, 擷取x至, 擷取y至)
+                            //回傳圖片base64給下個function
+                            nextFunc(canvas.toDataURL("image/jpeg",.8));
+                        }
+                        image.src = img;    //讀圖
+                    }
+
+                    //上傳失敗，還原圖片
+                    function resetURL(){
+                        var originalPath = [[${product.imgs}]];
+                        $('#picture').attr('src', originalPath);
+                        $('#picture').hide().fadeIn(500);
+                        $('#inputFile~.custom-file-label').text('product image (max 10MB)');
+                    }
+                })
+            </script>
+        </div>
+    </body>
+</html>

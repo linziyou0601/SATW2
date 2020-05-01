@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html 
+    xmlns:th="http://www.thymeleaf.org" 
+    xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout" 
+    layout:decorator="~{/layouts/base}"
+    th:with="currentPage='myOrders',navType='subNav'"
+>
+    <head>
+        <title th:text="${order.getProductTitle()}"></title>
+    </head>
+    <body>
+        <div layout:fragment="content">
+            <section class="page-section" id="info" style="min-height: calc(100vh - 96px);">
+                <div class="container">
+                    <div class="row justify-content-center">
+                        <div class="col-12">
+                            <div class="card o-hidden border-0 shadow-lg my-3 rounded">
+                                <div class="card-body p-0">
+                                    <div class="p-1 p-md-5">
+                                        <div class="row justify-content-center px-4 py-2">
+                                            <div class="col-12 col-md-6">
+                                                <img th:src="${order.getProductImgs()}" class="img-fluid">
+                                            </div>
+                                            <div class="col-12 col-md-6">
+                                                <!--Title-->
+                                                <div id="title" style="font-size: 1.8rem;" class="mt-5 mt-md-0 font-weight-bold text-aqua" th:text="${order.getProductTitle()}"></div>
+
+                                                <hr style="max-width: 80px; border-top: 3px solid #AAA;" class="ml-0 mt-3 mb-1"/>
+
+                                                <!--Price-->
+                                                <div class="mt-0 text-primary">
+                                                    <span class="font-weight-bold">$ </span>
+                                                    <span th:if="${order.getAmount()==order.getPayableAmount()}" style="font-size: 1.8rem;" class="font-weight-bold" th:text="${order.getAmount()}"></span>
+                                                    <span th:if="${order.getAmount()!=order.getPayableAmount()}" style="font-size: 1.6rem;" class=""><del th:text="${order.getAmount()}"></del></span>
+                                                    <span th:if="${order.getAmount()!=order.getPayableAmount()}" style="font-size: 1.8rem;" class="font-weight-bold" th:text="${order.getPayableAmount()}"></span>
+                                                    <span style="font-size: 1rem;" class="font-weight-bold" th:text="'($'+${order.getProductPrice()}+'×'+${order.quantity}+')'"></span>
+                                                    <span style="font-size: 1.2rem;" class="ml-2 badge badge-pill badge-primary" th:text="${order.stateType}"></span>
+                                                </div>
+
+                                                <!--Description-->
+                                                <div style="font-size: 1rem;" class="mt-3" th:text="${order.getProductDescription()}"></div>
+                                                
+                                                <hr style="border-top: 1px solid #AAA;" class="ml-0 mt-5"/>
+
+                                                <!--Other Info-->
+                                                <div class="row mt-2">
+                                                    <div class="col-6" style="font-size: 1.rem;">
+                                                        <div class="mb-1">
+                                                            <span class="font-weight-bold"><i class="fas fa-money-check-alt"></i></span>
+                                                            <span th:classappend="${order.buyer.id == session.user.id} ? 'text-aqua font-weight-bold': ''" th:text="${order.buyer.account}"></span>
+                                                        </div>
+                                                        <div class="my-1">
+                                                            <span class="font-weight-bold"><i class="fas fa-store"></i></span>
+                                                            <span th:classappend="${order.getProductSeller().id == session.user.id} ? 'text-aqua font-weight-bold': ''" th:text="${order.getProductSeller().account}"></span>
+                                                        </div>
+                                                        <div class="my-1">
+                                                            <span class="font-weight-bold"><i class="fas fa-cubes"></i></span>
+                                                            <span th:text="${order.quantity}"></span>
+                                                        </div>
+                                                        <div class="my-1">
+                                                            <span class="font-weight-bold"><i class="fas fa-map-marked-alt"></i></span>
+                                                            <span th:text="${order.buyer.getProfileAddress()}"></span>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-6" th:if="${session.user != null}">
+                                                        <button th:if="${order.stateType=='Ordered' and order.buyer.id == session.user.id}" id="payBtn" class="btn btn-block btn-outline-aqua mt-0 rounded-pill">Pay</button>
+                                                        <button th:if="${order.stateType=='Ordered'}" id="cancelBtn" class="btn btn-block btn-outline-secondary mt-3 rounded-pill">Cancel</button>
+                                                        <button th:if="${order.stateType=='Placed' and order.getProductSeller().id == session.user.id}"id="shipBtn" class="btn btn-block btn-outline-aqua mt-0 rounded-pill">Shipped</button>
+                                                        <button th:if="${order.stateType=='Shipped' and order.buyer.id == session.user.id}" id="receiveBtn" class="btn btn-block btn-outline-aqua mt-0 rounded-pill">Received</button>
+                                                    </div>
+                                                    <form id="orderForm" class="form my-2 my-lg-0 mr-auto" hidden="">
+                                                        <div class="form-group">
+                                                            <input type="number" name="id" th:value="${order.id}" hidden="" required=""/>
+                                                        </div>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <div layout:fragment="customJs" th:inline="javascript">
+            <script>
+                $(function(){
+                    var response;
+                    $("input[name='quantity']").inputSpinner();
+
+                    //----------------------------------------CANCEL----------------------------------------
+                    $("#cancelBtn").click(function (event) {
+                        event.preventDefault();
+                        Swal.fire({
+                            title: 'Cancel?',
+                            html: "Do you want cancel this order?",
+                            icon: 'question',
+                            showCancelButton: true,
+                        }).then(
+                            function (result) {
+                                if(result.value){
+                                    cancel();
+                                }
+                            }
+                        );
+                    });
+                    
+                    //--------------------CANCEL FUNCTION--------------------
+                    function cancel() {
+                        $('#loading').modal('show');
+                        $('#loading').on('shown.bs.modal', function (event) {
+                            var modal = $(this);
+                            // 取得form
+                            var form = $('#orderForm')[0];
+                            var data = new FormData(form);
+                            
+                            $("#cancelBtn").prop("disabled", true);
+                            $.ajax({
+                                type: "POST",               //使用POST傳輸,檔案上傳只能用POST
+                                enctype: 'multipart/form-data', //將資料加密傳輸 檔案上傳一定要有的屬性
+                                url: "/requestCancelOrder", //要傳輸對應的接口
+                                data: data,         //要傳輸的資料,我們將form 內upload打包成data
+                                processData: false, //防止jquery將data變成query String
+                                contentType: false, 
+                                cache: false,  //不做快取
+                                async : false  //設為同步
+                            }).done(function(response) {
+                                modal.off('shown.bs.modal');
+                                modal.modal("hide");
+                                $("#cancelBtn").prop("disabled", false);
+                                Swal.fire(response['title'], response['text'], response['icon']).then(
+                                    function () {
+                                        if(response['title']=="Successful") location.href = [[@{/myOrders}]];
+                                        else location.href = [[@{/myOrders/} + ${order.id}]];
+                                    }
+                                );
+                            })
+                        })
+                    }
+
+                    //----------------------------------------PAY----------------------------------------
+                    $("#payBtn").click(function (event) {
+                        event.preventDefault();
+                        Swal.fire({
+                            title: 'Make Payment?',
+                            html: "Do you want make payment of this order?",
+                            icon: 'question',
+                            showCancelButton: true,
+                        }).then(
+                            function (result) {
+                                if(result.value){
+                                    location.href = [[@{/wallet/makePayment/} + ${order.id}]];
+                                }
+                            }
+                        );
+                    });
+
+                    //----------------------------------------SHIP----------------------------------------
+                    $("#shipBtn").click(function (event) {
+                        event.preventDefault();
+                        Swal.fire({
+                            title: 'Shipped?',
+                            html: "Are you sure you has shipped the product?",
+                            icon: 'question',
+                            showCancelButton: true,
+                        }).then(
+                            function (result) {
+                                if(result.value){
+                                    ship("#shipBtn");
+                                }
+                            }
+                        );
+                    });
+
+                    //--------------------SHIP FUNCTION--------------------
+                    function ship() {
+                        $('#loading').modal('show');
+                        $('#loading').on('shown.bs.modal', function (event) {
+                            var modal = $(this);
+                            // 取得form
+                            var form = $('#orderForm')[0];
+                            var data = new FormData(form);
+                            
+                            $("#shipBtn").prop("disabled", true);
+                            $.ajax({
+                                type: "POST",               //使用POST傳輸,檔案上傳只能用POST
+                                enctype: 'multipart/form-data', //將資料加密傳輸 檔案上傳一定要有的屬性
+                                url: "/requestUpdateOrderState", //要傳輸對應的接口
+                                data: data,         //要傳輸的資料,我們將form 內upload打包成data
+                                processData: false, //防止jquery將data變成query String
+                                contentType: false, 
+                                cache: false,  //不做快取
+                                async : false  //設為同步
+                            }).done(function(response) {
+                                $('#loading').off('shown.bs.modal');
+                                $('#loading').modal("hide");
+                                $("#shipBtn").prop("disabled", false);
+                                Swal.fire(response['title'], response['text'], response['icon']).then(
+                                    function () {
+                                        if(response['title']=="Successful") location.href = [[@{/myOrders}]];
+                                        else location.href = [[@{/myOrders/} + ${order.id}]];
+                                    }
+                                );
+                            })
+                        })
+                    }
+
+                    //----------------------------------------RECEIVE----------------------------------------
+                    $("#receiveBtn").click(function (event) {
+                        event.preventDefault();
+                        Swal.fire({
+                            title: 'Received?',
+                            html: "Are you sure you wants to complete this order?",
+                            icon: 'question',
+                            showCancelButton: true,
+                        }).then(
+                            function (result) {
+                                if(result.value){
+                                    receive();
+                                }
+                            }
+                        );
+                    });
+
+                    //--------------------RECEIVE FUNCTION--------------------
+                    function receive() {
+                        $('#loading').modal('show');
+                        $('#loading').on('shown.bs.modal', function (event) {
+                            var modal = $(this);
+                            // 取得form
+                            var form = $('#orderForm')[0];
+                            var data = new FormData(form);
+                            
+                            $("#receiveBtn").prop("disabled", true);
+                            $.ajax({
+                                type: "POST",               //使用POST傳輸,檔案上傳只能用POST
+                                enctype: 'multipart/form-data', //將資料加密傳輸 檔案上傳一定要有的屬性
+                                url: "/requestReceiveOrder", //要傳輸對應的接口
+                                data: data,         //要傳輸的資料,我們將form 內upload打包成data
+                                processData: false, //防止jquery將data變成query String
+                                contentType: false, 
+                                cache: false,  //不做快取
+                                async : false  //設為同步
+                            }).done(function(response) {
+                                $('#loading').off('shown.bs.modal');
+                                $('#loading').modal("hide");
+                                $("#receiveBtn").prop("disabled", false);
+                                Swal.fire(response['title'], response['text'], response['icon']).then(
+                                    function () {
+                                        if(response['title']=="Successful") location.href = [[@{/myOrders}]];
+                                        else location.href = [[@{/myOrders/} + ${order.id}]];
+                                    }
+                                );
+                            })
+                        })
+                    }
+                })
+            </script>
+        </div>
+    </body>
+</html>

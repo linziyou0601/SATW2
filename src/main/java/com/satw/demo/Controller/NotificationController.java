@@ -1,0 +1,63 @@
+package com.satw.demo.Controller;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+
+import javax.servlet.http.HttpSession;
+import javax.sql.DataSource;
+
+import com.satw.demo.Dao.NotificationRepository;
+import com.satw.demo.Model.Notification;
+import com.satw.demo.Model.User;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+@Controller
+public class NotificationController {
+
+    @Autowired
+    OrderController orderController;
+
+    @Autowired
+    NotificationRepository notificationRepository;
+
+	@Autowired
+    DataSource dataSource;
+
+    public void createNotify(int userId, String txHash, int orderId, String type, String title, String description){
+        Notification notify;
+        notify = new Notification(userId, txHash, orderId, type, title, description);
+        notificationRepository.save(notify);
+        //Mediator
+        if(orderId>0 && type.equals("Payment Paid")) orderController.requestUpdateOrderState(orderId);
+    }
+
+    @GetMapping("notification")
+    public String notification(Model model, HttpSession session){
+        User user = (User) session.getAttribute("user");
+        if(user==null) return "redirect:/login?redirect=/notification";
+        List<Notification> notifications = notificationRepository.findByUserId(user.getId());
+        Collections.reverse(notifications);
+        model.addAttribute("notifications", notifications);
+        return "notification";
+    }
+
+    @PostMapping("readNotification")
+    @ResponseBody
+    public void readNotification(@RequestBody Map<String,String> reqMap) {
+        List<Notification> notifications = notificationRepository.findById(Integer.parseInt(reqMap.get("id")));
+        if(notifications.size()>0){
+            Notification notification = notifications.get(0);
+            if(notification.getReaded()==false)
+                notification.setReaded(true);
+            notificationRepository.saveAndFlush(notification);
+        }
+    }
+}

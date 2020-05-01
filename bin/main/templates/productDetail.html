@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html 
+    xmlns:th="http://www.thymeleaf.org" 
+    xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout" 
+    layout:decorator="~{/layouts/base}"
+    th:with="currentPage='myProducts',navType='subNav'"
+>
+    <head>
+        <title th:text="${product.title}"></title>
+    </head>
+    <body>
+        <div layout:fragment="content">
+            <section class="page-section" id="info" style="min-height: calc(100vh - 96px);">
+                <div class="container">
+                    <div class="row justify-content-center">
+                        <div class="col-12">
+                            <div class="card o-hidden border-0 shadow-lg my-3 rounded">
+                                <div class="card-body p-0">
+                                    <div class="p-1 p-md-5">
+                                        <div class="row justify-content-center px-4 py-2">
+                                            <div class="col-12 col-md-6">
+                                                <img th:src="${product.imgs}" class="img-fluid">
+                                            </div>
+                                            <div class="col-12 col-md-6">
+                                                <!--Title-->
+                                                <div id="title" style="font-size: 1.8rem;" class="mt-5 mt-md-0 font-weight-bold text-aqua" th:text="${product.title}"></div>
+
+                                                <hr style="max-width: 80px; border-top: 3px solid #AAA;" class="ml-0 mt-3 mb-1"/>
+
+                                                <!--Price-->
+                                                <div class="mt-0 text-primary">
+                                                    <span class="font-weight-bold">$ </span>
+                                                    <span style="font-size: 1.8rem;" class="font-weight-bold" th:text="${product.price}"></span>
+                                                </div>
+
+                                                <!--Description-->
+                                                <div style="font-size: 1rem;" class="mt-3" th:text="${product.description}"></div>
+                                                
+                                                <hr style="border-top: 1px solid #AAA;" class="ml-0 mt-5"/>
+
+                                                <!--Other Info-->
+                                                <div class="row mt-2">
+                                                    <div class="col-6" style="font-size: 1.rem;">
+                                                        <div class="mb-1">
+                                                            <span class="font-weight-bold"><i class="fas fa-user-tag"></i></span>
+                                                            <span th:text="${product.seller.account}"></span>
+                                                        </div>
+                                                        <div class="my-1">
+                                                            <span class="font-weight-bold"><i class="fas fa-cubes"></i></span>
+                                                            <span th:text="${product.stockQty}"></span>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-6" th:if="${session.user != null}">
+                                                        <form id="orderForm" class="form my-2 my-lg-0 mr-auto" th:if="${session.user.id != product.seller.id}">
+                                                            <div class="form-group">
+                                                                <input type="number" name="id" th:value="${product.id}" hidden="" required=""/>
+                                                            </div>
+                                                            <div class="form-group">
+                                                                <input id="quantity" class="form-control" type="number" value="1" min="1" th:max="${product.stockQty}" step="1" name="quantity" autofocus="" required=""/>
+                                                            </div>
+                                                            <div class="form-group">
+                                                                <input id="couponCode" class="form-control" type="text" name="couponCode" placehorder="coupon code" autofocus=""/>
+                                                            </div>
+                                                            <div id="couponAvailable" class="alert alert-info" role="alert"></div>
+                                                            <button id="orderBtn" class="btn btn-block btn-outline-secondary mt-3 rounded-pill" type="submit">Order</button>
+                                                        </form>
+                                                    </div>
+                                                    <div class="col-6" th:if="${session.user == null}">
+                                                        <button th:onclick="'location.href=\'' + @{/login} + '?redirect=/products/' + ${product.id} + '\''" class="btn btn-block btn-outline-secondary mt-3 rounded-pill">Login for Order</button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <div layout:fragment="customJs" th:inline="javascript">
+            <script>
+                $(function(){
+                    $("input[name='quantity']").inputSpinner();
+
+                    var discount = 0;
+                    $("#couponCode").on('input',function(e){
+                        discount = 0;
+                        if($("#couponCode").val().length == 16){
+                            $.ajax({
+                                type: "GET", 
+                                url: "/api/getCoupon?code="+$("#couponCode").val(),
+                                data: {}, cache: false, async : false
+                            }).done(function(response) {
+                                if(response['status']=="successful"){
+                                    if(response['available']==true){
+                                        discount = response['coupon']['discount'];
+                                        $('#couponAvailable').text("discount $"+response['coupon']['discount']);
+                                        $('#couponAvailable').removeClass("alert-danger").addClass("alert-info");
+                                    } else {
+                                        $('#couponAvailable').text("Coupon is unavailable!");
+                                        $('#couponAvailable').removeClass("alert-info").addClass("alert-danger");
+                                    }
+                                } else {
+                                    $('#couponAvailable').text("Invalid coupon code!");
+                                    $('#couponAvailable').removeClass("alert-info").addClass("alert-danger");
+                                }
+                            })
+                        } else {
+                            $('#couponAvailable').text("Invalid coupon code!");
+                            $('#couponAvailable').removeClass("alert-info").addClass("alert-danger");
+                        }
+                    });
+
+                    $("#orderBtn").click(function (event) {
+                        event.preventDefault();
+                        Swal.fire({
+                            title: 'Confirmation',
+                            html: "Do you want to buy <span class='text-aqua font-weight-bold'>" + $("#title").text() + "</span>?<br>"+
+                                  "Total: $<span class='text-danger font-weight-bold'>" + [[${product.price}]] + "</span> × <span class='text-danger font-weight-bold'>" + $("#quantity").val() + "</span> = <span class='text-danger font-weight-bold'>" + [[${product.price}]]*$("#quantity").val() + "</span><br>"+
+                                  "Discount: -$<span class='text-danger font-weight-bold'>" + discount + "</span><br>" +
+                                  "Payable: $<span class='text-danger font-weight-bold'>" + Math.max(0,[[${product.price}]]*$("#quantity").val()-discount) + "</span>",
+                            icon: 'info',
+                            showCancelButton: true,
+                        }).then(
+                            function (result) {
+                                if(result.value){
+                                    order();
+                                }
+                            }
+                        );
+                    });
+                    
+                    function order() {
+                        $('#loading').modal('show');
+                        $('#loading').on('shown.bs.modal', function (event) {
+                            var modal = $(this);
+                            // 取得form
+                            var form = $('#orderForm')[0];
+                            var data = new FormData(form);
+                            
+                            $("#orderBtn").prop("disabled", true);
+                            $.ajax({
+                                type: "POST",               //使用POST傳輸,檔案上傳只能用POST
+                                enctype: 'multipart/form-data', //將資料加密傳輸 檔案上傳一定要有的屬性
+                                url: "/requestOrder", //要傳輸對應的接口
+                                data: data,         //要傳輸的資料,我們將form 內upload打包成data
+                                processData: false, //防止jquery將data變成query String
+                                contentType: false, 
+                                cache: false,  //不做快取
+                                async : false  //設為同步
+                            }).done(function(response) {
+                                modal.off('shown.bs.modal');
+                                modal.modal("hide");
+                                $("#orderBtn").prop("disabled", false);
+                                if(response['title']=="Successful"){
+                                    Swal.fire(response['title'], "Order has ordered.", response['icon']).then(
+                                        function () {
+                                            if(response['title']=="Successful") location.href = [[@{/myOrders/}]]+response['text'];
+                                        }
+                                    );
+                                }else{
+                                    Swal.fire(response['title'], response['text'], response['icon']);
+                                }
+                                
+                            })
+                        })
+                        
+                    }
+                })
+            </script>
+        </div>
+    </body>
+</html>

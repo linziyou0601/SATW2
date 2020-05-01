@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html 
+    xmlns:th="http://www.thymeleaf.org" 
+    xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout" 
+    layout:decorator="~{/layouts/base}"
+    th:with="currentPage='products',navType='subNav'"
+>
+    <head>
+        <title>Products</title>
+    </head>
+    <body>
+        <div layout:fragment="content">
+            <section class="page-section" style="min-height: calc(100vh - 96px);">
+                <div class="container">
+                    <h2 class="text-center mt-0">Products</h2>
+                    <hr class="divider my-4">
+
+                    <div class="row justify-content-center">
+                        <div class="mx-1 mx-sm-2" th:each="product: ${products}" style="width:160px;">
+                            <a th:href="@{/products/} + ${product.id}" class="text-decoration-none">
+                                <div class="card o-hidden my-2 rounded shadow-sm border border-right">
+                                    <div class="card-body p-0">
+                                        <div class="row justify-content-center align-items-center text-center">
+                                            <div th:style="'width:160px; height:160px; background: url('+${product.imgs}+') no-repeat center center; background-size: cover;'"></div>
+                                        </div>
+                                        <div class="row justify-content-center align-items-center text-center px-4 mt-2">
+                                            <span style="font-size:1.2rem" class="font-weight-bold" th:text="${product.title}"></span>
+                                        </div>
+                                        <div class="row justify-content-center align-items-center text-center px-4 my-2">
+                                            <div class="col-7 px-1 py-1 text-left">
+                                                <span style="font-size:1rem" class="text-danger">$ </span>
+                                                <span style="font-size:1.2rem" class="text-danger font-weight-bold" th:text="${product.price}"></span>
+                                            </div>
+                                            <div class="col-5 px-1 py-1 text-right">
+                                                <span style="font-size:1rem" th:text="'('+${product.stockQty}+')'"></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </body>
+</html>
