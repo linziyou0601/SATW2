@@ -12,7 +12,11 @@ repositories {
 	mavenCentral()
 }
 
+apply plugin: 'war' // 打包為war
+war { enabled = true } // gradle build的時候Task :war才不會被SKIPPED
+
 dependencies {
+	providedRuntime 'org.springframework.boot:spring-boot-starter-tomcat' // 排除embedded tomcat
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	implementation 'org.springframework.boot:spring-boot-starter-data-rest'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
