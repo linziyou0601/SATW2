@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html 
+    xmlns:th="http://www.thymeleaf.org" 
+    xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout" 
+    layout:decorator="~{/layouts/base}"
+    th:with="currentPage='notification',navType='subNav'"
+>
+    <head>
+        <title>Notification</title>
+    </head>
+    <body>
+        <div layout:fragment="content">
+            <section class="page-section" style="min-height: calc(100vh - 96px);">
+                <div class="container">
+                    <h2 class="text-center mt-0">Notification</h2>
+                    <hr class="divider my-4">
+                    <div class="row justify-content-center" th:each="notification: ${notifications}">
+                        <div class="col-lg-6 col-md-8">
+                            <a href="javascript:void(0)" class="text-decoration-none" th:onClick="showNotify([[${notification.id}]], [[${notification.title}]], [[${notification.description}]], [[${notification.readed}]])">
+                                <div class="card o-hidden my-2 rounded shadow-sm border border-light">
+                                    <div class="card-body p-0">
+                                        <div class="row justify-content-center align-items-center px-4 py-2">
+                                            <div class="col-8 py-2 px-2 text-left">
+                                                <div style="font-size:1.2rem;" class="font-weight-bold text-truncate" th:text="${notification.description}"></div>
+                                                <div style="font-size:1rem;" th:text="${notification.title}"></div>
+                                            </div>
+                                            <div class="col-4 py-2 px-2 text-right">
+                                                <span th:id="'read'+${notification.id}" style="font-size:1.2rem;" class="font-weight-bold" th:classappend="${notification.readed} ? 'text-aqua': 'text-danger'" th:utext="${notification.readed} ? '<i class=\'fas fa-eye\'></i>': '<i class=\'fas fa-eye-slash\'></i>'"></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Notify MODAL -->
+            <div id="notify" class="modal fade" tabindex="-1" role="dialog">
+                <div class="modal-dialog modal-dialog-centered" role="document">
+                    <div class="modal-content">
+                        <div class="modal-body p-3">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span class="" aria-hidden="true">&times;</span>
+                            </button>
+                            <div style="font-size:1.2rem;" id="notifyTitle" class="font-weight-bold"></div>
+                            <hr style="max-width: 50px; border-top: 2px solid #999;" class="ml-0 my-3"/>
+                            <div style="font-size:1.2rem;" id="notifyDescription" class="mt-1 text-break"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div layout:fragment="customJs" th:inline="javascript">
+            <script>  
+                function showNotify(id, title, description, read) {
+                    $('#notifyTitle').text(title);
+                    $('#notifyDescription').html(description.replace(/\r\n|\n|\r/g, '<br/>'));
+                    $('#notify').modal('show');
+                    if(read==false){
+                        $("#read"+id).removeClass("text-danger").addClass("text-aqua");
+                        $("#read"+id).html("<i class='fas fa-eye'></i>");
+                        $.ajax({
+                            url : '/readNotification', 
+                            type : 'post',
+                            async:false, 
+                            data : JSON.stringify({"id":id}),
+                            contentType:'application/json',
+                            dataType : 'json',
+                        })
+                    }
+                }
+            </script>
+        </div>
+    </body>
+</html>
