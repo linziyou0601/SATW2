@@ -13,6 +13,7 @@ repositories {
 }
 
 apply plugin: 'war' // 打包為war
+apply plugin: "eclipse"
 war { enabled = true } // gradle build的時候Task :war才不會被SKIPPED
 
 dependencies {
