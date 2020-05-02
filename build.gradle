@@ -6,7 +6,7 @@ plugins {
 }
 
 group = 'com.satw'
-version = '0.0.1-SNAPSHOT'
+version = ''
 sourceCompatibility = '14'
 
 repositories {
