@@ -3,6 +3,7 @@ package com.satw.demo.Blockchain;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -66,10 +67,17 @@ public class Blockchain {
     public static LinkedList<Transaction> readUnverifiedTransactions(){
         LinkedList<Transaction> ut = new LinkedList<>();
         try {
-            Resource resource = new ClassPathResource("unverifiedTransactions.json");
+            String path = System.getProperty("user.home") + File.separator + "Blockchain";
+            File file = new File(path, "unverifiedTransactions.json");
+            if (!file.exists()) file.createNewFile();
+            FileReader fileReader = new FileReader(file.getAbsoluteFile());
+            Gson gson = new GsonBuilder().registerTypeAdapter(Transaction.class, new TransactionJsonDeserializer()).create();
+            ut = gson.fromJson(fileReader, new TypeToken<LinkedList<Transaction>>(){}.getType());
+
+            /*Resource resource = new ClassPathResource("unverifiedTransactions.json");
             Reader reader = new InputStreamReader(resource.getInputStream(), StandardCharsets.UTF_8);
             Gson gson = new GsonBuilder().registerTypeAdapter(Transaction.class, new TransactionJsonDeserializer()).create();
-            ut = gson.fromJson(reader, new TypeToken<LinkedList<Transaction>>(){}.getType());
+            ut = gson.fromJson(reader, new TypeToken<LinkedList<Transaction>>(){}.getType());*/
             /*Resource resource = new ClassPathResource("unverifiedTransactions.json");
             Gson gson = new GsonBuilder().registerTypeAdapter(Transaction.class, new TransactionJsonDeserializer()).create();
             ut = gson.fromJson(new FileReader(resource.getFile()), new TypeToken<LinkedList<Transaction>>(){}.getType());*/
@@ -83,12 +91,19 @@ public class Blockchain {
     public static void writeUnverifiedTransactions(LinkedList<Transaction> ut){
         Gson gson = new Gson();
         try {
-            Resource resource = new ClassPathResource("unverifiedTransactions.json");
+            String path = System.getProperty("user.home") + File.separator + "Blockchain";
+            File file = new File(path, "unverifiedTransactions.json");
+            if (!file.exists()) file.createNewFile();
+            FileWriter fw = new FileWriter(file.getAbsoluteFile());
+            BufferedWriter bw = new BufferedWriter(fw);
+            bw.write(gson.toJson(ut));
+            bw.close();
+            /*Resource resource = new ClassPathResource("unverifiedTransactions.json");
             Path path = Paths.get(resource.getURI());
             OutputStream out = new FileOutputStream(path.toAbsolutePath().toString());
             Writer writer = new OutputStreamWriter(out, "UTF-8");
             writer.write(gson.toJson(ut));
-            writer.close();
+            writer.close();*/
             /*Resource resource = new ClassPathResource("unverifiedTransactions.json");
             Writer unverifiedTransactionsWriter = new FileWriter(resource.getFile());
             gson.toJson(gson.toJson(ut), unverifiedTransactionsWriter);
@@ -143,10 +158,16 @@ public class Blockchain {
     public static LinkedList<Block> readChain(){
         LinkedList<Block> bc = new LinkedList<>();
         try {
-            Resource resource = new ClassPathResource("blockchain.json");
+            String path = System.getProperty("user.home") + File.separator + "Blockchain";
+            File file = new File(path, "blockchain.json");
+            if (!file.exists()) file.createNewFile();
+            FileReader fileReader = new FileReader(file.getAbsoluteFile());
+            Gson gson = new GsonBuilder().registerTypeAdapter(Transaction.class, new TransactionJsonDeserializer()).create();
+            bc = gson.fromJson(fileReader, new TypeToken<LinkedList<Transaction>>(){}.getType());
+            /*Resource resource = new ClassPathResource("blockchain.json");
             Reader reader = new InputStreamReader(resource.getInputStream(), StandardCharsets.UTF_8);
             Gson gson = new GsonBuilder().registerTypeAdapter(Block.class, new BlockJsonDeserializer()).create();
-            bc = gson.fromJson(reader, new TypeToken<LinkedList<Block>>(){}.getType());
+            bc = gson.fromJson(reader, new TypeToken<LinkedList<Block>>(){}.getType());*/
             /*Resource resource = new ClassPathResource("blockchain.json");
             Gson gson = new GsonBuilder().registerTypeAdapter(Block.class, new BlockJsonDeserializer()).create();
             bc = gson.fromJson(new FileReader(resource.getFile()), new TypeToken<LinkedList<Block>>(){}.getType());*/
@@ -160,13 +181,14 @@ public class Blockchain {
     public static void writeChain(LinkedList<Block> bc){
         Gson gson = new Gson();
         try {
+            String path = System.getProperty("user.home") + File.separator + "Blockchain";
+            File file = new File(path, "blockchain.json");
+            if (!file.exists()) file.createNewFile();
+            FileWriter fw = new FileWriter(file.getAbsoluteFile());
+            BufferedWriter bw = new BufferedWriter(fw);
+            bw.write(gson.toJson(bc));
+            bw.close();
             
-            Resource resource = new ClassPathResource("blockchain.json");
-            Path path = Paths.get(resource.getURI());
-            OutputStream out = new FileOutputStream(path.toAbsolutePath().toString());
-            Writer writer = new OutputStreamWriter(out, "UTF-8");
-            writer.write(gson.toJson(bc));
-            writer.close();
             /*Resource resource = new ClassPathResource("blockchain.json");
             File file = resource.getFile();
             if (!file.exists()) file.createNewFile();
