@@ -70,7 +70,7 @@ public class Blockchain {
             String path = System.getProperty("user.home") + File.separator + "Blockchain";
             File file = new File(path, "unverifiedTransactions.json");
             if (!file.exists()) file.createNewFile();
-            FileReader fileReader = new FileReader(file.getAbsoluteFile());
+            FileReader fileReader = new FileReader(file);
             Gson gson = new GsonBuilder().registerTypeAdapter(Transaction.class, new TransactionJsonDeserializer()).create();
             ut = gson.fromJson(fileReader, new TypeToken<LinkedList<Transaction>>(){}.getType());
 
@@ -162,7 +162,7 @@ public class Blockchain {
             System.out.println(path);
             File file = new File(path, "blockchain.json");
             if (!file.exists()) file.createNewFile();
-            FileReader fileReader = new FileReader(file.getAbsoluteFile());
+            FileReader fileReader = new FileReader(file);
             Gson gson = new GsonBuilder().registerTypeAdapter(Transaction.class, new TransactionJsonDeserializer()).create();
             bc = gson.fromJson(fileReader, new TypeToken<LinkedList<Transaction>>(){}.getType());
             /*Resource resource = new ClassPathResource("blockchain.json");
