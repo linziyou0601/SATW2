@@ -39,7 +39,7 @@ public class ManageProductController {
 	@Autowired
     DataSource dataSource;
 
-    String UPLOADED_FOLDER = System.getProperty("user.dir") + File.separator + "src" + File.separator + "main" + File.separator + "resources" + File.separator + "static";
+    String UPLOADED_FOLDER = System.getProperty("user.home") + File.separator + "uploads";
 
     //---------------------------------------我的產品---------------------------------------//
     //-------------------我的產品-------------------//
@@ -77,15 +77,16 @@ public class ManageProductController {
                 product = productRepository.saveAndFlush(product);
 
                 //上傳圖片
-                String imgs = "/images/product_img.png";
+                String imgs = "/uploads/product_img.png";
                 if (!files.isEmpty()) {
                     try {
-                        byte[] bytes = files.getBytes();
+                        File file = new File(UPLOADED_FOLDER);
                         String extension = FilenameUtils.getExtension(files.getOriginalFilename());
-                        File file = new File(UPLOADED_FOLDER + File.separator + "uploads", Integer.toString(product.getId()));
-                        Path path = Paths.get("/var/www/html/satw2/" + file.getAbsolutePath() + '.' + extension);
+                        Path path = Paths.get(file.getAbsolutePath() + File.separator + product.getId() + '.' + extension);
+                        System.out.println(path);
+                        byte[] bytes = files.getBytes();
                         OutputStream os = Files.newOutputStream(path);
-                        os.write(files.getBytes());
+                        os.write(bytes);
                         imgs = "/uploads/" + product.getId() + '.' + extension;
                         Files.write(path, bytes);
                     } catch (Exception e) {
@@ -149,20 +150,20 @@ public class ManageProductController {
                 if (!files.isEmpty()) {
                     try {
                         //刪除舊檔
-                        if(!imgs.equals("/images/product_img.png")){
+                        if(!imgs.equals("/uploads/product_img.png")){
                             File file = new File(UPLOADED_FOLDER);
-                            Path fileToDeletePath = Paths.get(file.getAbsolutePath()+imgs);
+                            Path fileToDeletePath = Paths.get(file.getAbsolutePath()+File.separator+imgs.substring(9));
                             System.out.println(fileToDeletePath);
                             Files.delete(fileToDeletePath);
                         }
                         //上傳新檔
-                        byte[] bytes = files.getBytes();
+                        File file = new File(UPLOADED_FOLDER);
                         String extension = FilenameUtils.getExtension(files.getOriginalFilename());
-                        File file = new File(UPLOADED_FOLDER + File.separator + "uploads", Integer.toString(product.getId()));
-                        Path path = Paths.get("/var/www/html/satw2/" + file.getAbsolutePath() + '.' + extension);
+                        Path path = Paths.get(file.getAbsolutePath() + File.separator + product.getId() + '.' + extension);
                         System.out.println(path);
+                        byte[] bytes = files.getBytes();
                         OutputStream os = Files.newOutputStream(path);
-                        os.write(files.getBytes());
+                        os.write(bytes);
                         imgs = "/uploads/" + product.getId() + '.' + extension;
                         Files.write(path, bytes);
                     } catch (Exception e) {

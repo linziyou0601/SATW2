@@ -82,7 +82,7 @@
                                 <div class="col-12">
                                     <div class="mx-auto p-4">
                                         <div class="text-center">
-                                            <img id="picture" th:src="@{/images/product_img.png}" name="picture" alt="photo" class="img-fluid"/>
+                                            <img id="picture" th:src="@{/uploads/product_img.png}" name="picture" alt="photo" class="img-fluid"/>
                                         </div>
                                     </div>
                                 </div>
@@ -231,7 +231,7 @@
 
                     //上傳失敗，還原圖片
                     function resetURL(){
-                        var originalPath = [[@{/images/product_img.png}]];
+                        var originalPath = [[@{/uploads/product_img.png}]];
                         $('#picture').attr('src', originalPath);
                         $('#picture').hide().fadeIn(500);
                         $('#inputFile~.custom-file-label').text('product image (max 10MB)');

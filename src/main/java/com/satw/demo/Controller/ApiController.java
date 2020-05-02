@@ -1,5 +1,9 @@
 package com.satw.demo.Controller;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -20,10 +24,13 @@ import com.satw.demo.Model.Product;
 import com.satw.demo.Model.User;
 import static com.satw.demo.Util.StringUtil.generateCouponCode;
 import static com.satw.demo.Util.StringUtil.generateCouponDiscount;
+import static com.satw.demo.Util.StringUtil.bytesToString;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
@@ -165,5 +172,23 @@ public class ApiController {
         result.put("status", "successful");
         result.put("products", gson.fromJson(gson.toJson(products), Object.class));
         return result;
+    }
+
+    @GetMapping(value = "/uploads/{filename}", produces = MediaType.IMAGE_PNG_VALUE)
+    @ResponseBody
+    public byte[] pixelTracking(@PathVariable String filename) {
+        byte[] bytes = new byte[1];
+        String UPLOADED_FOLDER = System.getProperty("user.home") + File.separator + "uploads";
+
+        try{
+            File file = new File(UPLOADED_FOLDER, filename);
+            FileInputStream fileInputStreamReader = new FileInputStream(new File(file.getAbsolutePath()));
+            bytes = new byte[(int)file.length()];
+            fileInputStreamReader.read(bytes);
+            fileInputStreamReader.close();
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
+        return bytes;
     }
 }
