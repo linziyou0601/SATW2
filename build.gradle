@@ -16,8 +16,11 @@ repositories {
 apply plugin: 'war' // 打包為war
 apply plugin: 'org.springframework.boot'
 war {
-    enabled = true   // gradle build的時候Task :war才不會被SKIPPED
     baseName = 'demo'
+    enabled = true   // gradle build的時候Task :war才不會被SKIPPED
+}
+bootWar {
+	launchScript()
 }
 
 dependencies {
