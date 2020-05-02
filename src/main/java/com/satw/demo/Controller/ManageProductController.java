@@ -1,5 +1,6 @@
 package com.satw.demo.Controller;
 
+import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -78,6 +79,8 @@ public class ManageProductController {
                         byte[] bytes = files.getBytes();
                         String extension = FilenameUtils.getExtension(files.getOriginalFilename());
                         Path path = Paths.get(UPLOADED_FOLDER + product.getId() + '.' + extension);
+                        OutputStream os = Files.newOutputStream(path);
+                        os.write(files.getBytes());
                         imgs = "/uploads/" + product.getId() + '.' + extension;
                         Files.write(path, bytes);        
                     } catch (Exception e) {
@@ -150,6 +153,8 @@ public class ManageProductController {
                         byte[] bytes = files.getBytes();
                         String extension = FilenameUtils.getExtension(files.getOriginalFilename());
                         Path path = Paths.get(UPLOADED_FOLDER + product.getId() + '.' + extension);
+                        OutputStream os = Files.newOutputStream(path);
+                        os.write(files.getBytes());
                         imgs = "/uploads/" + product.getId() + '.' + extension;
                         Files.write(path, bytes);        
                     } catch (Exception e) {

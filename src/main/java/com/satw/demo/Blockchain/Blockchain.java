@@ -2,11 +2,17 @@ package com.satw.demo.Blockchain;
 
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.io.Reader;
+import java.io.Writer;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -78,13 +84,11 @@ public class Blockchain {
         Gson gson = new Gson();
         try {
             Resource resource = new ClassPathResource("unverifiedTransactions.json");
-            File file = resource.getFile();
-            if (!file.exists()) file.createNewFile();
-
-            FileWriter fw = new FileWriter(file.getAbsoluteFile());
-            BufferedWriter bw = new BufferedWriter(fw);
-            bw.write(gson.toJson(ut));
-            bw.close();
+            Path path = Paths.get(resource.getURI());
+            OutputStream out = new FileOutputStream(path.toAbsolutePath().toString());
+            Writer writer = new OutputStreamWriter(out, "UTF-8");
+            writer.write(gson.toJson(ut));
+            writer.close();
             /*Resource resource = new ClassPathResource("unverifiedTransactions.json");
             Writer unverifiedTransactionsWriter = new FileWriter(resource.getFile());
             gson.toJson(gson.toJson(ut), unverifiedTransactionsWriter);
@@ -156,14 +160,21 @@ public class Blockchain {
     public static void writeChain(LinkedList<Block> bc){
         Gson gson = new Gson();
         try {
+            
             Resource resource = new ClassPathResource("blockchain.json");
+            Path path = Paths.get(resource.getURI());
+            OutputStream out = new FileOutputStream(path.toAbsolutePath().toString());
+            Writer writer = new OutputStreamWriter(out, "UTF-8");
+            writer.write(gson.toJson(bc));
+            writer.close();
+            /*Resource resource = new ClassPathResource("blockchain.json");
             File file = resource.getFile();
             if (!file.exists()) file.createNewFile();
 
             FileWriter fw = new FileWriter(file.getAbsoluteFile());
             BufferedWriter bw = new BufferedWriter(fw);
             bw.write(gson.toJson(bc));
-            bw.close();
+            bw.close();*/
             
             /*Resource resource = new ClassPathResource("blockchain.json");
             Writer blockchainWriter = new FileWriter(resource.getFile());
