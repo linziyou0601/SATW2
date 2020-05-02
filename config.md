@@ -44,6 +44,10 @@
 
 ### Ports
 
+    phpMyAdmin: 
+        TCP 8888 allow  (HTTPS)
+        TCP 3306 allow  (HTTP)
+
     satw2: 
         TCP 443  allow  (HTTPS)
         TCP 8087 allow  (HTTP)
@@ -51,6 +55,10 @@
     satw2bot:
         TCP 4567 allow  (HTTPS)
         TCP 5000 deny   (HTTP)
+        
+    tomcat:
+        TCP 8080 allow  (HTTPS)
+        TCP 8081 deny   (HTTP)
 
 ### 監聽 port 80, 443 `/etc/apache2/ports.conf`
 
@@ -194,13 +202,12 @@ Listen 80
 
 ## Spring Boot 網站維護
 
-### 備份區塊鏈及圖片
+### 刪除區塊鏈及圖檔
 
-    makir ~/bc
-    sudo cp /var/www/html/satw2/bin/main/unverifiedTransactions.json ~/bc
-    sudo cp /var/www/html/satw2/bin/main/blockchain.json ~/bc
-    mkdir ~/uploads
-    sudo cp /var/www/html/satw2/bin/main/blockchain.json ~/bc/stat
+    sudo rm -rf /root/Blockchain
+    sudo rm -rf /root/uploads
+    sudo mkdir /root/Blockchain
+    sudo mkdir /root/uploads
 
 ### 刪除舊檔
 
@@ -213,21 +220,44 @@ Listen 80
     sudo wget -O satw2.zip https://github.com/linziyou0601/SATW2/archive/master.zip
     sudo unzip satw2.zip
     sudo mv SATW2-master satw2
+    sudo chmod 777 -R satw2
+    cd satw2
+    sudo cp src/main/resources/static/images/product_img.png /root/uploads
 
-### 開啟、關閉維護模式(down開啟、up關閉)
+### 產生war檔
 
-    cd /var/www/html/linziyou0601-laravel
-    php artisan down
-    php artisan up
+    sudo ./gradlew bootWar
 
-### 資料夾權限
+### 安裝為系統服務
 
-    cd /var/www/html
-    sudo chmod 755 -R linziyou0601-laravel; sudo chown $USER:www-data -R linziyou0601-laravel; sudo chmod 775 -R linziyou0601-laravel/storage linziyou0601-laravel/bootstrap/cache
+```ini
+[Unit]
+#/etc/systemd/system/satw2.service
+Description=SATW2 Demo Spring Boot Project
+After=syslog.target
+After=network.target[Service]
+User=qqq23939889
+Type=simple
 
-### 環境變數 `.env` 下的 `DB_PASSWORD` 及 `APP_DEBUG` 要記得改
+[Service]
+ExecStart=/usr/bin/java -jar /var/www/html/satw2/build/libs/demo.war
+Restart=always
+StandardOutput=syslog
+StandardError=syslog
+SyslogIdentifier=helloworld
 
-    sudo vim /var/www/html/linziyou0601-laravel/.env
+[Install]
+WantedBy=multi-user.target
+```
+
+### 利用 `systemctl` 管理程式
+
+    sudo systemctl start satw2.service    # starts the service
+    sudo systemctl enable satw2.service   # auto starts the service
+    sudo systemctl disable satw2t.service # stops autostart
+    sudo systemctl stop satw2.service     # stops the service
+    sudo systemctl restart satw2.service  # restarts the service
+    sudo journalctl -u satw2.service      # check all status
 
 ------------
 
