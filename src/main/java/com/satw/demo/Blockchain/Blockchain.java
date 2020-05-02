@@ -159,6 +159,7 @@ public class Blockchain {
         LinkedList<Block> bc = new LinkedList<>();
         try {
             String path = System.getProperty("user.home") + File.separator + "Blockchain";
+            System.out.println(path);
             File file = new File(path, "blockchain.json");
             if (!file.exists()) file.createNewFile();
             FileReader fileReader = new FileReader(file.getAbsoluteFile());
