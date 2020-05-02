@@ -70,17 +70,10 @@ public class Blockchain {
             String path = System.getProperty("user.home") + File.separator + "Blockchain";
             File file = new File(path, "unverifiedTransactions.json");
             if (!file.exists()) file.createNewFile();
-            FileReader fileReader = new FileReader(file);
+            FileReader fileReader = new FileReader(file.getAbsolutePath());
+            
             Gson gson = new GsonBuilder().registerTypeAdapter(Transaction.class, new TransactionJsonDeserializer()).create();
             ut = gson.fromJson(fileReader, new TypeToken<LinkedList<Transaction>>(){}.getType());
-
-            /*Resource resource = new ClassPathResource("unverifiedTransactions.json");
-            Reader reader = new InputStreamReader(resource.getInputStream(), StandardCharsets.UTF_8);
-            Gson gson = new GsonBuilder().registerTypeAdapter(Transaction.class, new TransactionJsonDeserializer()).create();
-            ut = gson.fromJson(reader, new TypeToken<LinkedList<Transaction>>(){}.getType());*/
-            /*Resource resource = new ClassPathResource("unverifiedTransactions.json");
-            Gson gson = new GsonBuilder().registerTypeAdapter(Transaction.class, new TransactionJsonDeserializer()).create();
-            ut = gson.fromJson(new FileReader(resource.getFile()), new TypeToken<LinkedList<Transaction>>(){}.getType());*/
             if(ut!=null) ut.sort(Comparator.comparingLong(Transaction::getTimestamp));
         } catch (Exception e) {
             e.printStackTrace();
@@ -98,16 +91,6 @@ public class Blockchain {
             BufferedWriter bw = new BufferedWriter(fw);
             bw.write(gson.toJson(ut));
             bw.close();
-            /*Resource resource = new ClassPathResource("unverifiedTransactions.json");
-            Path path = Paths.get(resource.getURI());
-            OutputStream out = new FileOutputStream(path.toAbsolutePath().toString());
-            Writer writer = new OutputStreamWriter(out, "UTF-8");
-            writer.write(gson.toJson(ut));
-            writer.close();*/
-            /*Resource resource = new ClassPathResource("unverifiedTransactions.json");
-            Writer unverifiedTransactionsWriter = new FileWriter(resource.getFile());
-            gson.toJson(gson.toJson(ut), unverifiedTransactionsWriter);
-			unverifiedTransactionsWriter.close();*/
         } catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -159,19 +142,12 @@ public class Blockchain {
         LinkedList<Block> bc = new LinkedList<>();
         try {
             String path = System.getProperty("user.home") + File.separator + "Blockchain";
-            System.out.println(path);
             File file = new File(path, "blockchain.json");
             if (!file.exists()) file.createNewFile();
-            FileReader fileReader = new FileReader(file);
+            FileReader fileReader = new FileReader(file.getAbsolutePath());
+            
             Gson gson = new GsonBuilder().registerTypeAdapter(Transaction.class, new TransactionJsonDeserializer()).create();
-            bc = gson.fromJson(fileReader, new TypeToken<LinkedList<Transaction>>(){}.getType());
-            /*Resource resource = new ClassPathResource("blockchain.json");
-            Reader reader = new InputStreamReader(resource.getInputStream(), StandardCharsets.UTF_8);
-            Gson gson = new GsonBuilder().registerTypeAdapter(Block.class, new BlockJsonDeserializer()).create();
-            bc = gson.fromJson(reader, new TypeToken<LinkedList<Block>>(){}.getType());*/
-            /*Resource resource = new ClassPathResource("blockchain.json");
-            Gson gson = new GsonBuilder().registerTypeAdapter(Block.class, new BlockJsonDeserializer()).create();
-            bc = gson.fromJson(new FileReader(resource.getFile()), new TypeToken<LinkedList<Block>>(){}.getType());*/
+            bc = gson.fromJson(fileReader, new TypeToken<LinkedList<Block>>(){}.getType());
             if(bc!=null) bc.sort(Comparator.comparingLong(Block::getTimestamp));
         } catch (Exception e) {
             e.printStackTrace();
@@ -189,20 +165,6 @@ public class Blockchain {
             BufferedWriter bw = new BufferedWriter(fw);
             bw.write(gson.toJson(bc));
             bw.close();
-            
-            /*Resource resource = new ClassPathResource("blockchain.json");
-            File file = resource.getFile();
-            if (!file.exists()) file.createNewFile();
-
-            FileWriter fw = new FileWriter(file.getAbsoluteFile());
-            BufferedWriter bw = new BufferedWriter(fw);
-            bw.write(gson.toJson(bc));
-            bw.close();*/
-            
-            /*Resource resource = new ClassPathResource("blockchain.json");
-            Writer blockchainWriter = new FileWriter(resource.getFile());
-            gson.toJson(gson.toJson(bc), blockchainWriter);
-			blockchainWriter.close();*/
         } catch (IOException e) {
 			e.printStackTrace();
 		}

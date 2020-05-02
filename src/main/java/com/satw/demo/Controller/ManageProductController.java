@@ -37,9 +37,6 @@ public class ManageProductController {
 	@Autowired
     DataSource dataSource;
 
-    @Value("${file.uploadFolder}")
-    String uploadFolder;
-
     //---------------------------------------我的產品---------------------------------------//
     //-------------------我的產品-------------------//
     @GetMapping("myProducts")
@@ -83,6 +80,7 @@ public class ManageProductController {
                         byte[] bytes = files.getBytes();
                         String extension = FilenameUtils.getExtension(files.getOriginalFilename());
                         Path path = Paths.get(UPLOADED_FOLDER + product.getId() + '.' + extension);
+                        System.out.println(path);
                         OutputStream os = Files.newOutputStream(path);
                         os.write(files.getBytes());
                         imgs = "/uploads/" + product.getId() + '.' + extension;
