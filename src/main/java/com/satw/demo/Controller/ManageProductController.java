@@ -1,5 +1,6 @@
 package com.satw.demo.Controller;
 
+import java.io.File;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -75,7 +76,7 @@ public class ManageProductController {
                 //上傳圖片
                 String imgs = "/images/product_img.png";
                 if (!files.isEmpty()) {
-                    String UPLOADED_FOLDER = "./src/main/resources/static/uploads/";
+                    String UPLOADED_FOLDER = System.getProperty("user.dir") + File.separator + "src" + File.separator + "main" + File.separator + "resources" + File.separator + "static" + File.separator + "uploads";
                     try {
                         byte[] bytes = files.getBytes();
                         String extension = FilenameUtils.getExtension(files.getOriginalFilename());
@@ -144,7 +145,7 @@ public class ManageProductController {
                 //上傳圖片
                 String imgs = product.getImgs();
                 if (!files.isEmpty()) {
-                    String UPLOADED_FOLDER = "./src/main/resources/static/uploads/";
+                    String UPLOADED_FOLDER = System.getProperty("user.dir") + File.separator + "src" + File.separator + "main" + File.separator + "resources" + File.separator + "static" + File.separator + "uploads";
                     try {
                         //刪除舊檔
                         if(!imgs.equals("/images/product_img.png")){
