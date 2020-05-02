@@ -8,6 +8,7 @@ import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.List;
 
+import javax.servlet.ServletContext;
 import javax.servlet.http.HttpSession;
 import javax.sql.DataSource;
 
@@ -37,6 +38,8 @@ public class ManageProductController {
 	
 	@Autowired
     DataSource dataSource;
+
+    String UPLOADED_FOLDER = System.getProperty("user.dir") + File.separator + "src" + File.separator + "main" + File.separator + "resources" + File.separator + "static";
 
     //---------------------------------------我的產品---------------------------------------//
     //-------------------我的產品-------------------//
@@ -70,22 +73,21 @@ public class ManageProductController {
                 else msg = new Msg("Failed", "Stock Quantity Can Not Less Than 0.", "error");
             } else {
                 //建立商品
-                Product product = new Product(user, title, description, price, null, stockQty);                                                                            //外鍵
+                Product product = new Product(user, title, description, price, null, stockQty);
                 product = productRepository.saveAndFlush(product);
 
                 //上傳圖片
                 String imgs = "/images/product_img.png";
                 if (!files.isEmpty()) {
-                    String UPLOADED_FOLDER = System.getProperty("user.dir") + File.separator + "src" + File.separator + "main" + File.separator + "resources" + File.separator + "static" + File.separator + "uploads";
                     try {
                         byte[] bytes = files.getBytes();
                         String extension = FilenameUtils.getExtension(files.getOriginalFilename());
-                        Path path = Paths.get(UPLOADED_FOLDER + product.getId() + '.' + extension);
-                        System.out.println(path);
+                        File file = new File(UPLOADED_FOLDER + File.separator + "uploads", Integer.toString(product.getId()));
+                        Path path = Paths.get(file.getAbsolutePath() + '.' + extension);
                         OutputStream os = Files.newOutputStream(path);
                         os.write(files.getBytes());
                         imgs = "/uploads/" + product.getId() + '.' + extension;
-                        Files.write(path, bytes);        
+                        Files.write(path, bytes);
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -145,21 +147,24 @@ public class ManageProductController {
                 //上傳圖片
                 String imgs = product.getImgs();
                 if (!files.isEmpty()) {
-                    String UPLOADED_FOLDER = System.getProperty("user.dir") + File.separator + "src" + File.separator + "main" + File.separator + "resources" + File.separator + "static" + File.separator + "uploads";
                     try {
                         //刪除舊檔
                         if(!imgs.equals("/images/product_img.png")){
-                            Path fileToDeletePath = Paths.get("./src/main/resources/static"+imgs);
+                            File file = new File(UPLOADED_FOLDER);
+                            Path fileToDeletePath = Paths.get(file.getAbsolutePath()+imgs);
+                            System.out.println(fileToDeletePath);
                             Files.delete(fileToDeletePath);
                         }
                         //上傳新檔
                         byte[] bytes = files.getBytes();
                         String extension = FilenameUtils.getExtension(files.getOriginalFilename());
-                        Path path = Paths.get(UPLOADED_FOLDER + product.getId() + '.' + extension);
+                        File file = new File(UPLOADED_FOLDER + File.separator + "uploads", Integer.toString(product.getId()));
+                        Path path = Paths.get(file.getAbsolutePath() + '.' + extension);
+                        System.out.println(path);
                         OutputStream os = Files.newOutputStream(path);
                         os.write(files.getBytes());
                         imgs = "/uploads/" + product.getId() + '.' + extension;
-                        Files.write(path, bytes);        
+                        Files.write(path, bytes);
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
