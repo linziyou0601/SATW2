@@ -83,7 +83,7 @@ public class ManageProductController {
                         byte[] bytes = files.getBytes();
                         String extension = FilenameUtils.getExtension(files.getOriginalFilename());
                         File file = new File(UPLOADED_FOLDER + File.separator + "uploads", Integer.toString(product.getId()));
-                        Path path = Paths.get(file.getAbsolutePath() + '.' + extension);
+                        Path path = Paths.get("/var/www/html/satw2/" + file.getAbsolutePath() + '.' + extension);
                         OutputStream os = Files.newOutputStream(path);
                         os.write(files.getBytes());
                         imgs = "/uploads/" + product.getId() + '.' + extension;
@@ -159,7 +159,7 @@ public class ManageProductController {
                         byte[] bytes = files.getBytes();
                         String extension = FilenameUtils.getExtension(files.getOriginalFilename());
                         File file = new File(UPLOADED_FOLDER + File.separator + "uploads", Integer.toString(product.getId()));
-                        Path path = Paths.get(file.getAbsolutePath() + '.' + extension);
+                        Path path = Paths.get("/var/www/html/satw2/" + file.getAbsolutePath() + '.' + extension);
                         System.out.println(path);
                         OutputStream os = Files.newOutputStream(path);
                         os.write(files.getBytes());
