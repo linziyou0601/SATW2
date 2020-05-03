@@ -6,13 +6,9 @@ import java.util.Map;
 
 import javax.net.ssl.SSLContext;
 import javax.servlet.http.HttpSession;
-import javax.sql.DataSource;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import com.satw.demo.Dao.CouponRepository;
-import com.satw.demo.Dao.OrderRepository;
-import com.satw.demo.Dao.ProductRepository;
 import com.satw.demo.Model.User;
 
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
@@ -20,7 +16,6 @@ import org.apache.http.conn.ssl.TrustStrategy;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.ssl.SSLContexts;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
