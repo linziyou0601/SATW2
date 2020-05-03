@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html 
+    xmlns:th="http://www.thymeleaf.org" 
+    xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout" 
+    layout:decorator="layouts/base"
+    th:with="currentPage='linebotBind',navType='subNav'"
+>
+    <head>
+        <title>Linebot Bind</title>
+    </head>
+    <body>
+        <div layout:fragment="content">
+            <section class="page-section" style="min-height: calc(100vh - 96px);">
+                <div class="container">
+                    <div class="row justify-content-center">
+                        <!--狀態-->
+                        <div class="col-12 border bg-white py-2 rounded-lg shadow-sm" style="max-width: 300px;">
+                            <p class="mb-0 text-success" style="font-size:0.9rem;">綁定狀態</p>
+                            <h3 class="my-2" th:appendclass="${class}" th:text="${tint}"></h3>
+                            <hr class="mx-2 mt-4" th:if="${bind=='0'}">
+                            <h4 class="m-2 text-primary text-center" th:if="${bind=='0'}"><a class="text-decoration-none" th:href="@{/linebot/doBind/}+${channel_id}">前往綁定</a></h4>
+                        </div>
+                        <!---->
+                    </div>                    
+                </div>
+            </section>
+        </div>
+
+        <div layout:fragment="customJs" th:inline="javascript">
+            <script>
+                $(function(){                    
+                })
+            </script>
+        </div>
+    </body>
+</html>

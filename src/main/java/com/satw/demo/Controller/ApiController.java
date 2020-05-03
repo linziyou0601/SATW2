@@ -174,6 +174,7 @@ public class ApiController {
         return result;
     }
 
+    //---------------------------------------GET IMAGES---------------------------------------//
     @GetMapping(value = "/uploads/{filename}", produces = MediaType.IMAGE_PNG_VALUE)
     @ResponseBody
     public byte[] pixelTracking(@PathVariable String filename) {

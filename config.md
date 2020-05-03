@@ -263,23 +263,24 @@ WantedBy=multi-user.target
 
 ## LINE BOT 網站維護（uWSGI開關）
 
-### 利用　wget 取得 github上 的 coolpanda.zip
+### 利用　wget 取得 github上 的 SATW2BOT.zip
 
     cd /var/www
-    sudo wget -O coolpanda.zip https://github.com/linziyou0601/coolpanda/archive/master.zip
-    sudo unzip coolpanda.zip
-    sudo mv coolpanda-master coolpanda
+    sudo rm -rf satw2bot
+    sudo wget -O satw2bot.zip https://github.com/linziyou0601/SATW2BOT/archive/master.zip
+    sudo unzip satw2bot.zip
+    sudo mv SATW2BOT-master satw2bot
 
 ### 利用 `uwgsi.pid` 及 `uwgsi.status` 管理程式
 
-    sudo uwsgi --ini /var/www/coolpanda/uwsgi/uwsgi.ini                 //啟動
-    sudo tail -f /var/www/coolpanda/uwsgi/uwsgi.log                     //查看log
-    sudo uwsgi --stop /var/www/coolpanda/uwsgi/uwsgi.pid                //關閉
-    sudo uwsgi --reload /var/www/coolpanda/uwsgi/uwsgi.pid              //重啟
+    sudo uwsgi --ini /var/www/satw2bot/uwsgi/uwsgi.ini                 //啟動
+    sudo tail -f /var/www/satw2bot/uwsgi/uwsgi.log                     //查看log
+    sudo uwsgi --stop /var/www/satw2bot/uwsgi/uwsgi.pid                //關閉
+    sudo uwsgi --reload /var/www/satw2bot/uwsgi/uwsgi.pid              //重啟
     sudo tail -f /var/log/apache2/access.log                      //apache2 access.log
 
 ### 若忘了做 `uwsgi --stop` 可用以下方法關閉（防止佔用 port 5000）
 
     sudo netstat -tulpn     //查詢佔用port
-    ps aux | grep BotApp    //查詢PID
-    sudo kill -9 <PID_NUMBER>  //kill掉 BotApp uWSGI 開頭的所有程式
+    ps aux | grep satw2bot    //查詢PID
+    sudo kill -9 <PID_NUMBER>  //kill掉 satw2bot uWSGI 開頭的所有程式
