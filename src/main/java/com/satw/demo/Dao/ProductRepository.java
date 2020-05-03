@@ -14,6 +14,6 @@ public interface ProductRepository extends JpaRepository<Product, Long>{
 	List<Product> findById(int id);
 	List<Product> findBySeller(User seller);
 
-	@Query("select p from Product p where p.stockQty > 0 and (p.title like %:key% or p.description like %:key%)")
+	@Query("select p from Product p where p.stockQty > 0 and (p.title like %:key% or p.description like %:key%) order by create_time desc, price asc")
     public List<Product> findAllAvailable(@Param("key") String key);
 }

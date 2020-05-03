@@ -47,7 +47,6 @@ public class ProductController {
     @GetMapping("products")
     public String products(@RequestParam(value="key", required=false, defaultValue="") String key, Model model){
         List<Product> products = productRepository.findAllAvailable(key);
-        Collections.reverse(products);
         model.addAttribute("key", key);
         model.addAttribute("products", products);
         return "products";
