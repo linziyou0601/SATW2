@@ -25,7 +25,6 @@ import com.satw.demo.Model.Product;
 import com.satw.demo.Model.User;
 import static com.satw.demo.Util.StringUtil.generateCouponCode;
 import static com.satw.demo.Util.StringUtil.generateCouponDiscount;
-import static com.satw.demo.Util.StringUtil.bytesToString;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;

@@ -115,8 +115,7 @@ public class OrderController {
         } else {
             if(orders.size()>0 && orders.get(0).getBuyer().getId() == user.getId() && orders.get(0).getState() instanceof Shipped){
                 Order order = orders.get(0);
-                List<User> users = userRepository.findById(1);
-                User thirdParty = users.get(0);
+                User thirdParty = Blockchain.getThirdParty();
                 //第三方補差額
                 while(thirdParty.getWalletBalance()<order.getAmount()){
                     Transaction tx = thirdParty.makeDeposit(order.getAmount()-thirdParty.getWalletBalance());

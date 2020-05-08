@@ -21,8 +21,8 @@ public class Notification {
     private int id;
 
     //Object Attribute
-    @Column(name="userId")
-    private int userId;
+    @Column(name="userWalletAddress", columnDefinition="TEXT")
+    private String userWalletAddress;
     @Column(name="txHash", columnDefinition="TEXT")
     private String txHash;
     @Column(name="orderId")
@@ -47,8 +47,8 @@ public class Notification {
     //------------------------------------Method------------------------------------
     //Constructor
     public Notification(){}
-    public Notification(int userId, String txHash, int orderId, String type, String title, String description) {
-        this.userId = userId;
+    public Notification(String userWalletAddress, String txHash, int orderId, String type, String title, String description) {
+        this.userWalletAddress = userWalletAddress;
         this.txHash = txHash;
         this.orderId = orderId;
         this.type = type;
@@ -61,11 +61,11 @@ public class Notification {
     public int getId(){
         return id;
     }
-    public int getUserId(){
-        return userId;
+    public String getUserWalletAddress(){
+        return userWalletAddress;
     }
-    public void setUserId(int userId){
-        this.userId = userId;
+    public void setUserWalletAddress(String userWalletAddress){
+        this.userWalletAddress = userWalletAddress;
     }
     public String getTxHash(){
         return txHash;

@@ -3,19 +3,19 @@ package com.satw.demo.Blockchain;
 import java.util.LinkedList;
 
 public class Deposit extends Transaction {
-    private int receiverId;
+    private String receiverAddress;
     //-------------------- 建構子、Getter、Setter --------------------
-    public Deposit(String publicKey, int receiverId, int amount){
-        super(publicKey, "Deopsit "+Integer.toString(amount), amount, null, "Deposit");
-        this.receiverId = receiverId;
+    public Deposit(String publicKey, String receiverAddress, int amount){
+        super(publicKey, "Deposit "+Integer.toString(amount), amount, null, "Deposit");
+        this.receiverAddress = receiverAddress;
     }
-    public int getReceiverId(){ return receiverId; }
+    public String getReceiverAddress(){ return receiverAddress; }
 
     //交易處理
     private void deposit(){
         LinkedList<TransactionOutput> outputs = super.getOutputs();
         //建立交易輸出金流
-        outputs.add(new TransactionOutput(receiverId, super.getAmount(), super.getHash()));
+        outputs.add(new TransactionOutput(receiverAddress, super.getAmount(), super.getHash()));
         //將新的UTXO放到鏈的UTXO清單中
         for(TransactionOutput output: super.getOutputs()) Blockchain.putUTXOs(output.getHash(), output);
     }
@@ -36,7 +36,7 @@ public class Deposit extends Transaction {
     }
 
     public String hashPlainData() {
-        return (Integer.toString(receiverId) +
+        return (receiverAddress +
                 super.getDetail() +
                 Integer.toString(super.getAmount()) +
                 Integer.toString(super.getSequence())

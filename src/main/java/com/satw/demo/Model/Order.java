@@ -164,10 +164,10 @@ public class Order {
         return s;
     }
     public void notifyUnpaidOrder(NotificationController notificationController){
-        notificationController.createNotify(buyer.getId(), "", id, "Unpaid Order", "Unpaid Order", getDetail());
+        notificationController.createNotify(buyer.getWalletAddress(), "", id, "Unpaid Order", "Unpaid Order", getDetail());
     }
     public void notifyUnshipOrder(NotificationController notificationController){
-        notificationController.createNotify(product.getSeller().getId(), "", id, "Unship Order", "Unship Order", getDetail());
+        notificationController.createNotify(product.getSeller().getWalletAddress(), "", id, "Unship Order", "Unship Order", getDetail());
     }
     public void sendOrderDetail(){
 

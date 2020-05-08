@@ -16,12 +16,17 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import com.satw.demo.Controller.NotificationController;
+import com.satw.demo.Controller.UserController;
+import com.satw.demo.Model.User;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
 public class Blockchain {
+
+    @Autowired
+    UserController userController;
 
     @Autowired
     NotificationController notificationController;
@@ -34,7 +39,10 @@ public class Blockchain {
     @PostConstruct
     public void init() {    
         blockchain = this;
-    } 
+    }
+
+    // TIRDPARTY
+    public static User getThirdParty(){ return blockchain.userController.getThirdParty(); }
 
     // UTXOs
     public static HashMap<String, TransactionOutput> getUTXOs(){ return blockchain.UTXOs; }
@@ -112,14 +120,14 @@ public class Blockchain {
                     Transaction upTx = unverifiedTransactions.get(index);
                     if(upTx!=null){
                         if(tx.getClassType().equals("Payment")){
-                            blockchain.notificationController.createNotify(((Payment)tx).getPayerId(), ((Payment)tx).getHash(), ((Payment)tx).getOrderId(), "Payment Paid", "Payment Paid", ((Payment)tx).getDetail());
-                            blockchain.notificationController.createNotify(((Payment)tx).getReceiverId(), ((Payment)tx).getHash(), ((Payment)tx).getOrderId(), "Payment Received", "Payment Received", ((Payment)tx).getDetail());
+                            blockchain.notificationController.createNotify(((Payment)tx).getPayerAddress(), ((Payment)tx).getHash(), ((Payment)tx).getOrderId(), "Payment Paid", "Payment Paid", ((Payment)tx).getDetail());
+                            blockchain.notificationController.createNotify(((Payment)tx).getReceiverAddress(), ((Payment)tx).getHash(), ((Payment)tx).getOrderId(), "Payment Received", "Payment Received", ((Payment)tx).getDetail());
                         }
                         else if(tx.getClassType().equals("Deposit")){
-                            blockchain.notificationController.createNotify(((Deposit)tx).getReceiverId(), ((Deposit)tx).getHash(), 0, "Deposit", "Deposit Coin", ((Deposit)tx).getDetail());
+                            blockchain.notificationController.createNotify(((Deposit)tx).getReceiverAddress(), ((Deposit)tx).getHash(), 0, "Deposit", "Deposit Coin", ((Deposit)tx).getDetail());
                         }
                         else if(tx.getClassType().equals("Withdraw")){
-                            blockchain.notificationController.createNotify(((Withdraw)tx).getPayerId(), ((Withdraw)tx).getHash(), 0, "Withdraw", "Withdraw Money", ((Withdraw)tx).getDetail());
+                            blockchain.notificationController.createNotify(((Withdraw)tx).getPayerAddress(), ((Withdraw)tx).getHash(), 0, "Withdraw", "Withdraw Money", ((Withdraw)tx).getDetail());
                         }
                     }
                     removeUnverifiedTransaction(tx);

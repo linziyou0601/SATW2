@@ -47,11 +47,11 @@
                                                     <div class="col-6" style="font-size: 1.rem;">
                                                         <div class="mb-1">
                                                             <span class="font-weight-bold"><i class="fas fa-money-check-alt"></i></span>
-                                                            <span th:classappend="${order.buyer.id == session.user.id} ? 'text-aqua font-weight-bold': ''" th:text="${order.buyer.account}"></span>
+                                                            <span th:classappend="${order.buyer.id == session.user.id} ? 'text-aqua font-weight-bold': ''" th:text="${order.buyer.getProfileName()}"></span>
                                                         </div>
                                                         <div class="my-1">
                                                             <span class="font-weight-bold"><i class="fas fa-store"></i></span>
-                                                            <span th:classappend="${order.getProductSeller().id == session.user.id} ? 'text-aqua font-weight-bold': ''" th:text="${order.getProductSeller().account}"></span>
+                                                            <span th:classappend="${order.getProductSeller().id == session.user.id} ? 'text-aqua font-weight-bold': ''" th:text="${order.getProductSeller().getProfileName()}"></span>
                                                         </div>
                                                         <div class="my-1">
                                                             <span class="font-weight-bold"><i class="fas fa-cubes"></i></span>

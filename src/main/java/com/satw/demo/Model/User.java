@@ -123,6 +123,9 @@ public class User{
     }
     
     //Mediator
+    public String getProfileName(){
+        return profile.getName();
+    }
     public String getProfileAddress(){
         return profile.getAddress();
     }
@@ -134,6 +137,9 @@ public class User{
     }
     public String getWalletPrivateKey(){
         return wallet.getPrivateKey();
+    }
+    public String getWalletAddress(){
+        return wallet.getAddress();
     }
     public int getWalletBalance(){
         return wallet.getBalance();

@@ -53,7 +53,6 @@
                         <div class="col-lg-6 col-md-8">
                             <div class="card o-hidden my-2 rounded shadow-sm border border-right">
                                 <div class="card-body p-0">
-                                    <span class="badge badge-pill badge-primary orderState" th:text="${order.stateType}"></span>
                                     <div class="row justify-content-center align-items-center">
                                         <div class="col-4">
                                             <img th:src="${order.getProductImgs()}" class="img-fluid">
@@ -67,11 +66,11 @@
                                             </div>
                                             <div class="mb-1">
                                                 <span class="font-weight-bold"><i class="fas fa-money-check-alt"></i></span>
-                                                <span th:classappend="${order.buyer.id == session.user.id} ? 'text-aqua font-weight-bold': ''" th:text="${order.buyer.account}"></span>
+                                                <span th:classappend="${order.buyer.id == session.user.id} ? 'text-aqua font-weight-bold': ''" th:text="${order.buyer.getProfileName()}"></span>
                                             </div>
                                             <div class="my-1">
                                                 <span class="font-weight-bold"><i class="fas fa-store"></i></span>
-                                                <span th:classappend="${order.getProductSeller().id == session.user.id} ? 'text-aqua font-weight-bold': ''" th:text="${order.getProductSeller().account}"></span>
+                                                <span th:classappend="${order.getProductSeller().id == session.user.id} ? 'text-aqua font-weight-bold': ''" th:text="${order.getProductSeller().getProfileName()}"></span>
                                             </div>
                                             <div class="my-1">
                                                 <span class="font-weight-bold"><i class="fas fa-cubes"></i></span>
@@ -83,6 +82,7 @@
                                             </div>
                                         </div>
                                     </div>
+                                    <span class="badge badge-pill badge-primary orderState" th:text="${order.stateType}"></span>
                                 </div>
                             </div>
                         </div>

@@ -1,6 +1,7 @@
 package com.satw.demo.Blockchain;
 
 import java.time.Instant;
+import java.util.Base64;
 import java.util.LinkedList;
 
 import com.satw.demo.Util.KeyPairUtil;
@@ -65,7 +66,7 @@ public abstract class Transaction {
     //encrypt using private key
     public void generateSignature(String privateKey) {
         String plainData = hashPlainData();
-        signature = StringUtil.bytesToString(
+        signature = StringUtil.base64Encode(
                 KeyPairUtil.applyECDSASig(
                         KeyPairUtil.stringToPrivateKey(privateKey),
                         plainData
@@ -78,7 +79,7 @@ public abstract class Transaction {
         return KeyPairUtil.verifyECDSASig(
                 KeyPairUtil.stringToPublicKey(publicKey),
                 plainData,
-                StringUtil.stringToBytes(signature)
+                StringUtil.base64Decode(signature)
         );
     }
 

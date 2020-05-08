@@ -34,11 +34,11 @@
                                             </div>
                                             <div class="col-12 px-1 text-left">
                                                 <span style="font-size:1rem" >buyer: </span>
-                                                <span style="font-size:1rem" th:classappend="${order.buyer.id == session.user.id} ? 'text-aqua font-weight-bold': ''" th:text="${order.buyer.account}"></span>
+                                                <span style="font-size:1rem" th:classappend="${order.buyer.id == session.user.id} ? 'text-aqua font-weight-bold': ''" th:text="${order.buyer.getProfileName()}"></span>
                                             </div>
                                             <div class="col-12 px-1 text-left">
                                                 <span style="font-size:1rem" >seller: </span>
-                                                <span style="font-size:1rem" th:classappend="${order.getProductSeller().id == session.user.id} ? 'text-aqua font-weight-bold': ''" th:text="${order.getProductSeller().account}"></span>
+                                                <span style="font-size:1rem" th:classappend="${order.getProductSeller().id == session.user.id} ? 'text-aqua font-weight-bold': ''" th:text="${order.getProductSeller().getProfileName()}"></span>
                                             </div>
                                         </div>
                                     </div>

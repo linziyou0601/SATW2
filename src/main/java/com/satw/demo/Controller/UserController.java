@@ -119,4 +119,11 @@ public class UserController {
         session.invalidate();
         return "redirect:/login";
     }
+
+    //-------------------取得第三方使用者-------------------//
+    //Mediator
+    public User getThirdParty(){
+        List<User> users = userRepository.findById(1);
+        return users.get(0);
+    }
 }

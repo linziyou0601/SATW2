@@ -10,6 +10,7 @@ import java.security.SecureRandom;
 import java.security.Signature;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
 import static com.satw.demo.Util.StringUtil.*;
@@ -55,22 +56,37 @@ public class KeyPairUtil {
 
     //Key轉String
     public static String keyToString(Key key) {
-        return bytesToString(key.getEncoded());
+        return base64Encode(key.getEncoded());
+        //return Base64.getEncoder().encodeToString(key.getEncoded());
     }
 
     //String轉Key
     public static PrivateKey stringToPrivateKey(String keyString) {
         try {
-            byte[] privateKeyBytes = stringToBytes(keyString);
+            byte[] privateKeyBytes = base64Decode(keyString);
             KeyFactory kf = KeyFactory.getInstance("EC");
             return kf.generatePrivate(new PKCS8EncodedKeySpec(privateKeyBytes));
         } catch (Exception e) { throw new RuntimeException(e); }
     }
     public static PublicKey stringToPublicKey(String keyString) {
         try {
-            byte[] publicKeyBytes = stringToBytes(keyString);
+            byte[] publicKeyBytes = base64Decode(keyString);
             KeyFactory kf = KeyFactory.getInstance("EC");
             return kf.generatePublic(new X509EncodedKeySpec(publicKeyBytes));
         } catch (Exception e) { throw new RuntimeException(e); }
+    }
+
+    //Public 和 WalletAddress
+    public static String getPublicKeyHash(PublicKey publicKey){
+        return "00"+RipeMD160(SHA256(keyToString(publicKey)));
+    }
+    public static String publicKeyToAddress(PublicKey publicKey){
+        String publicKeyHash = getPublicKeyHash(publicKey);
+        String doubleSha256 = SHA256(SHA256(publicKeyHash));
+        return base58Encode((publicKeyHash + doubleSha256.substring(0,8)).getBytes());
+    }
+    public static String addressToPublicKeyHash(String address){
+        String addressDecode = new String(base58Decode(address));
+        return addressDecode.substring(addressDecode.length()-8);
     }
 }

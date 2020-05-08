@@ -62,7 +62,7 @@
                     <h2 class="text-center mt-5">Transaction Detail</h2>
                     <hr class="divider my-2">
                     <div class="row justify-content-center" th:each="tx: ${session.user.getWalletDetail()}">
-                        <div class="col-lg-6 col-md-8">
+                        <div class="col-lg-6 col-md-8" data-toggle="modal" th:data-target="'#TX-'+${tx.hash}">
                             <div class="card o-hidden my-2 rounded shadow-sm border border-light">
                                 <div class="card-body p-0">
                                     <div class="row justify-content-center align-items-center text-center px-4 py-2">
@@ -70,10 +70,58 @@
                                             <div th:text="${tx.detail}"></div>
                                         </div>
                                         <div class="col-4 px-1 py-2">
-                                            <h4 class="text-danger font-weight-bold" th:if="${tx.classType == 'Payment' and tx.payerId == session.user.id}" th:text="'-' + ${tx.amount}"></h4>
-                                            <h4 class="text-aqua font-weight-bold" th:if="${tx.classType == 'Payment' and tx.receiverId == session.user.id}" th:text="'+' + ${tx.amount}"></h4>
+                                            <h4 class="text-danger font-weight-bold" th:if="${tx.classType == 'Payment' and tx.payerAddress == session.user.getWalletAddress()}" th:text="'-' + ${tx.amount}"></h4>
+                                            <h4 class="text-aqua font-weight-bold" th:if="${tx.classType == 'Payment' and tx.receiverAddress == session.user.getWalletAddress()}" th:text="'+' + ${tx.amount}"></h4>
                                             <h4 class="text-aqua font-weight-bold" th:if="${tx.classType == 'Deposit'}" th:text="'+' + ${tx.amount}"></h4>
                                             <h4 class="text-danger font-weight-bold" th:if="${tx.classType == 'Withdraw'}" th:text="'-' + ${tx.amount}"></h4>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+
+                        <!-- TX-DETAIL MODAL -->
+                        <div th:id="'TX-'+${tx.hash}" class="modal fade" tabindex="-1" role="dialog">
+                            <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+                                <div class="modal-content">
+                                    <div class="modal-body bg-dark p-3">
+                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                            <span class="text-light" aria-hidden="true">&times;</span>
+                                        </button>
+                                        <div class="row justify-content-center text-white mx-2">
+                                            <div class="col-12 col-md-6">
+                                                <div class="row justify-content-center text-center">
+                                                    <div class="col-12 px-1 py-2">Transaction Intputs</div>
+                                                </div>
+                                                <div class="row justify-content-center border border-white m-2" th:if="${tx.inputs != null}" th:each="txin: ${tx.inputs}">
+                                                    <div class="col-12 px-1 py-1">
+                                                        <div class="text-monospace text-break" th:text="'Output Hash: ' + ${txin.sourceOutputHash}"></div>
+                                                    </div>
+                                                    <div class="col-12 px-1 py-1">
+                                                        <div class="text-monospace text-break" th:text="'From: ' + ${txin.payerAddress}"></div>
+                                                    </div>
+                                                    <div class="col-12 px-1 py-1">
+                                                        <h2 class="text-monospace text-break" th:text="'SAC: ' + ${txin.amount}"></h2>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-12 col-md-6">
+                                                <div class="row justify-content-center text-center">
+                                                    <div class="col-12 px-1 py-2">Transaction Outputs</div>
+                                                </div>
+                                                <div class="row justify-content-center border border-white m-2" th:if="${tx.outputs != null}" th:each="txout: ${tx.outputs}">
+                                                    <div class="col-12 px-1 py-1">
+                                                        <div class="text-monospace text-break" th:text="'Hash: ' + ${txout.hash}"></div>
+                                                    </div>
+                                                    <div class="col-12 px-1 py-1">
+                                                        <div class="text-monospace text-break" th:text="'To: ' + ${txout.receiverAddress}"></div>
+                                                    </div>
+                                                    <div class="col-12 px-1 py-1">
+                                                        <h2 class="text-monospace text-break" th:text="'SAC: ' + ${txout.amount}"></h2>
+                                                    </div>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -101,6 +149,11 @@
                             <div class="mt-4 font-weight-bold text-light">Private Key</div>
                             <hr style="max-width: 50px; border-top: 2px solid #FFF;" class="ml-0 mt-1 mb-1"/>
                             <div class="mt-1 text-light text-monospace text-break" th:text="${session.user.getWalletPrivateKey()}"></div>
+
+
+                            <div class="mt-4 font-weight-bold text-light">Wallet Address</div>
+                            <hr style="max-width: 50px; border-top: 2px solid #FFF;" class="ml-0 mt-1 mb-1"/>
+                            <div class="mt-1 text-light text-monospace text-break" th:text="${session.user.getWalletAddress()}"></div>
                         </div>
                     </div>
                 </div>

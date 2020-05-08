@@ -31,9 +31,9 @@ public class NotificationController {
 	@Autowired
     DataSource dataSource;
 
-    public void createNotify(int userId, String txHash, int orderId, String type, String title, String description){
+    public void createNotify(String userWalletAddress, String txHash, int orderId, String type, String title, String description){
         Notification notify;
-        notify = new Notification(userId, txHash, orderId, type, title, description);
+        notify = new Notification(userWalletAddress, txHash, orderId, type, title, description);
         notificationRepository.save(notify);
         //Mediator
         if(orderId>0 && type.equals("Payment Paid")) orderController.requestUpdateOrderState(orderId);
@@ -43,7 +43,7 @@ public class NotificationController {
     public String notification(Model model, HttpSession session){
         User user = (User) session.getAttribute("user");
         if(user==null) return "redirect:/login?redirect=/notification";
-        List<Notification> notifications = notificationRepository.findByUserId(user.getId());
+        List<Notification> notifications = notificationRepository.findByUserWalletAddress(user.getWalletAddress());
         Collections.reverse(notifications);
         model.addAttribute("notifications", notifications);
         return "notification";

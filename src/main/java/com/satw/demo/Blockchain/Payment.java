@@ -3,18 +3,18 @@ package com.satw.demo.Blockchain;
 import java.util.LinkedList;
 
 public class Payment extends Transaction {
-    private int payerId;
-    private int receiverId;
+    private String payerAddress;
+    private String receiverAddress;
     private int orderId;
     //-------------------- 建構子、Getter、Setter --------------------
-    public Payment(String publicKey, int payerId, int receiverId, int orderId, String detail, int amount, LinkedList<TransactionInput> inputs){
+    public Payment(String publicKey, String payerAddress, String receiverAddress, int orderId, String detail, int amount, LinkedList<TransactionInput> inputs){
         super(publicKey, detail, amount, inputs, "Payment");
-        this.payerId = payerId;
-        this.receiverId = receiverId;
+        this.payerAddress = payerAddress;
+        this.receiverAddress = receiverAddress;
         this.orderId = orderId;
     }
-    public int getPayerId(){ return payerId; }
-    public int getReceiverId(){ return receiverId; }
+    public String getPayerAddress(){ return payerAddress; }
+    public String getReceiverAddress(){ return receiverAddress; }
     public int getOrderId(){ return orderId; }
 
     //交易處理
@@ -22,8 +22,8 @@ public class Payment extends Transaction {
         LinkedList<TransactionOutput> outputs = super.getOutputs();
         //建立交易輸出金流
         int restAmount = getInputsAmount() - super.getAmount();
-        outputs.add(new TransactionOutput(receiverId, super.getAmount(), super.getHash()));
-        if(restAmount>0) outputs.add(new TransactionOutput(payerId, restAmount, super.getHash()));
+        outputs.add(new TransactionOutput(receiverAddress, super.getAmount(), super.getHash()));
+        if(restAmount>0) outputs.add(new TransactionOutput(payerAddress, restAmount, super.getHash()));
         //將新的UTXO放到鏈的UTXO清單中
         for(TransactionOutput output: super.getOutputs()) Blockchain.putUTXOs(output.getHash(), output);
         //從鏈的UTXO清單將已使用掉的UTXO移出
@@ -53,8 +53,8 @@ public class Payment extends Transaction {
     }
 
     public String hashPlainData() {
-        return (Integer.toString(payerId) +
-                Integer.toString(receiverId) +
+        return (payerAddress +
+                receiverAddress +
                 super.getDetail() +
                 Integer.toString(super.getAmount()) +
                 Integer.toString(super.getSequence())
