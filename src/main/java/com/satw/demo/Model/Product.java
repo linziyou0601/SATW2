@@ -19,6 +19,9 @@ import javax.persistence.TemporalType;
 
 import com.google.gson.annotations.Expose;
 
+import org.hibernate.annotations.UpdateTimestamp;
+import org.springframework.data.annotation.CreatedDate;
+
 @Entity
 @Table(name = "product")
 public class Product{
@@ -55,10 +58,12 @@ public class Product{
 
     //Timestamp
     @Temporal(TemporalType.TIMESTAMP)
+    @CreatedDate
     @Column(name = "createTime",  updatable = false, columnDefinition="TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
     @Expose
     private Date createTime;
     @Temporal(TemporalType.TIMESTAMP)
+    @UpdateTimestamp
     @Column(name = "updateTime",  updatable = false, columnDefinition="TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")
     @Expose
     private Date updateTime;

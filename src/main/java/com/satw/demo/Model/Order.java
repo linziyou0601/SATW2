@@ -23,6 +23,9 @@ import com.google.gson.annotations.Expose;
 import com.satw.demo.Controller.NotificationController;
 import com.satw.demo.Controller.OrderController;
 
+import org.hibernate.annotations.UpdateTimestamp;
+import org.springframework.data.annotation.CreatedDate;
+
 @Entity
 @Table(name = "orders")
 @Access(AccessType.FIELD)
@@ -57,10 +60,12 @@ public class Order {
 
     //Timestamp
     @Temporal(TemporalType.TIMESTAMP)
+    @CreatedDate
     @Column(name = "createTime",  updatable = false, columnDefinition="TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
     @Expose
     private Date createTime;
     @Temporal(TemporalType.TIMESTAMP)
+    @UpdateTimestamp
     @Column(name = "updateTime",  updatable = false, columnDefinition="TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")
     @Expose
     private Date updateTime;
