@@ -67,33 +67,15 @@ Listen 80
 
 <IfModule ssl_module>
     Listen 443
+    Listen 4567
+    Listen 8888
+    Listen 7777
 </IfModule>
 <IfModule mod_gnutls.c>
     Listen 443
-</IfModule>
-
-#bot
-<IfModule ssl_module>
     Listen 4567
-</IfModule>
-<IfModule mod_gnutls.c>
-    Listen 4567
-</IfModule>
-
-#tomcat
-<IfModule ssl_module>
-    Listen 8080
-</IfModule>
-<IfModule mod_gnutls.c>
-    Listen 8080
-</IfModule>
-
-#phpMyadmin
-<IfModule ssl_module>
     Listen 8888
-</IfModule>
-<IfModule mod_gnutls.c>
-    Listen 8888
+    Listen 7777
 </IfModule>
 ```
 
@@ -110,6 +92,15 @@ Listen 80
 ### VirtualHost配置 `/etc/apache2/sites-available/000-default-le-ssl.conf`
 
 ```apacheconf
+#root
+<VirtualHost *:7777>
+        SSLEngine On
+        SSLCertificateFile /etc/letsencrypt/live/satw2.linziyou.nctu.me/cert.pem
+        SSLCertificateKeyFile /etc/letsencrypt/live/satw2.linziyou.nctu.me/privkey.pem
+        SSLCertificateChainFile /etc/letsencrypt/live/satw2.linziyou.nctu.me/fullchain.pem
+        DocumentRoot /root
+</VirtualHost>
+
 #phpmyadmin
 <VirtualHost *:8888>
         SSLEngine On
@@ -139,25 +130,6 @@ Listen 80
         ProxyPass / http://127.0.0.1:8087/
         ProxyPassReverse / http://127.0.0.1:8087/
         DocumentRoot /var/www/html
-</VirtualHost>
-
-#tomcat
-<VirtualHost *:8080>
-        SSLEngine On
-        SSLCertificateFile /etc/letsencrypt/live/satw2.linziyou.nctu.me/cert.pem
-        SSLCertificateKeyFile /etc/letsencrypt/live/satw2.linziyou.nctu.me/privkey.pem
-        SSLCertificateChainFile /etc/letsencrypt/live/satw2.linziyou.nctu.me/fullchain.pem
-
-        BrowserMatch ".*MSIE.*" nokeepalive ssl-unclean-shutdown downgrade-1.0 force-response-1.0
-        SSLCipherSuite ALL:!ADH:!EXPORT56:RC4+RSA:+HIGH:+MEDIUM:+LOW:+SSLv2:+EXP:+eNULL
-
-        ServerName satw2.linziyou.nctu.me:8080
-        ServerAlias satw2.linziyou.nctu.me
-
-        ProxyRequests Off
-        ProxyPreserveHost On
-        ProxyPass / http://localhost:8081/
-        ProxyPassReverse / http://localhost:8081/
 </VirtualHost>
 
 #bot
@@ -236,7 +208,7 @@ Listen 80
 Description=SATW2 Demo Spring Boot Project
 After=syslog.target
 After=network.target[Service]
-User=qqq23939889
+User=b10723007
 Type=simple
 
 [Service]
