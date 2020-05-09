@@ -7,6 +7,7 @@ import javax.persistence.AccessType;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EntityListeners;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -23,11 +24,13 @@ import com.google.gson.annotations.Expose;
 import com.satw.demo.Controller.NotificationController;
 import com.satw.demo.Controller.OrderController;
 
-import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 @Entity
 @Table(name = "orders")
+@EntityListeners(AuditingEntityListener.class)
 @Access(AccessType.FIELD)
 public class Order {    
     //------------------------------------DB Columns------------------------------------
@@ -65,7 +68,7 @@ public class Order {
     @Expose
     private Date createTime;
     @Temporal(TemporalType.TIMESTAMP)
-    @UpdateTimestamp
+    @LastModifiedDate
     @Column(name = "updateTime",  updatable = false, columnDefinition="TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")
     @Expose
     private Date updateTime;
