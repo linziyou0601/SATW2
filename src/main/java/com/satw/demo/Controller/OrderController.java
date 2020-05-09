@@ -88,7 +88,7 @@ public class OrderController {
         if(user==null){
             msg = new Msg("Error", "Invalid operation!", "error");
         } else {
-            if(orders.size()>0 && (orders.get(0).getBuyer().getId() == user.getId() || orders.get(0).getProductSeller().getId() == user.getId()) && orders.get(0).getState() instanceof Ordered){
+            if(orders.size()>0 && (orders.get(0).getBuyerId() == user.getId() || orders.get(0).getProductSellerId() == user.getId()) && orders.get(0).getState() instanceof Ordered){
                 Order order = orders.get(0);
                 Product product = productRepository.findById(order.getProductId()).get(0);
                 product.addStockQty(order.getQuantity());

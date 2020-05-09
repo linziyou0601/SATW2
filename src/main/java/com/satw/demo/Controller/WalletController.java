@@ -85,17 +85,22 @@ public class WalletController {
     //---------------------------------------提款---------------------------------------//
     @PostMapping("wallet/requestWithdraw")
     @ResponseBody
-    public Msg requestWithdraw(@RequestParam("amount") int amount, HttpSession session) {
+    public Msg requestWithdraw(@RequestParam("amount") String amountStr, HttpSession session) {
         Msg msg = new Msg();
         User user = (User) session.getAttribute("user");
         if(user==null){
             msg = new Msg("Error", "Invalid operation!", "error");
         } else {
-            if(amount>0 && amount <= user.getWalletBalance()){
-                Transaction tx = user.makeWithdraw(amount);
-                msg = requestSendOtp(tx, user);
-            } else {
-                msg = new Msg("Failed", "Your Amount Must Large Than 0 and Small or Equal to "+user.getWalletBalance(), "error");
+            try {
+                int amount = Integer.parseInt(amountStr);
+                if(amount>0 && amount <= user.getWalletBalance()){
+                    Transaction tx = user.makeWithdraw(amount);
+                    msg = requestSendOtp(tx, user);
+                } else {
+                    msg = new Msg("Failed", "Your Amount Must Large Than 0 and Small or Equal to "+user.getWalletBalance(), "error");
+                }
+            } catch(NumberFormatException e){
+                msg = new Msg("Error", "Invalid Number.", "error");
             }
         }
         return msg;
@@ -104,22 +109,27 @@ public class WalletController {
     //---------------------------------------存款---------------------------------------//
     @PostMapping("wallet/requestDeposit")
     @ResponseBody
-    public Msg requestDeposit(@RequestParam("amount") int amount, HttpSession session) {
+    public Msg requestDeposit(@RequestParam("amount") String amountStr, HttpSession session) {
         Msg msg;
         User user = (User) session.getAttribute("user");
         if(user==null){
             msg = new Msg("Error", "Invalid operation!", "error");
         } else {
-            if(amount>0){
-                Transaction tx = user.makeDeposit(amount);
-                if(tx!=null){
-                    Blockchain.addUnveriedTransaction(tx);
-                    msg = new Msg("Successful", "Your transaction "+tx.getDetail()+" has sent to blockchain", "success");
+            try {
+                int amount = Integer.parseInt(amountStr);
+                if(amount>0){
+                    Transaction tx = user.makeDeposit(amount);
+                    if(tx!=null){
+                        Blockchain.addUnveriedTransaction(tx);
+                        msg = new Msg("Successful", "Your transaction "+tx.getDetail()+" has sent to blockchain", "success");
+                    } else {
+                        msg = new Msg("Failed", "It has some trubles.", "error");
+                    }
                 } else {
-                    msg = new Msg("Failed", "It has some trubles.", "error");
+                    msg = new Msg("Failed", "Your Amount Can Not <= 0", "error");
                 }
-            } else {
-                msg = new Msg("Failed", "Your Amount Can Not <= 0", "error");
+            } catch(NumberFormatException e){
+                msg = new Msg("Error", "Invalid Number.", "error");
             }
         }
         return msg;

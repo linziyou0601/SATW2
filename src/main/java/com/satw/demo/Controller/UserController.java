@@ -17,13 +17,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-
-import at.favre.lib.crypto.bcrypt.BCrypt;
 
 @Controller
 public class UserController {
@@ -39,39 +36,40 @@ public class UserController {
 
     //---------------------------------------註冊頁---------------------------------------//
     @GetMapping("register")
-    public String register(Model model, HttpSession session,  RedirectAttributes attr){
+    public String register(HttpSession session,  RedirectAttributes attr){
         if(session.getAttribute("user")!=null) return "redirect:/";
-        model.addAttribute("register", new User());
-        model.addAttribute("profile", new Profile());
         return "register";
     }
 
     @PostMapping("/requestRegister")
     @ResponseBody
-    public Msg requestRegister(@ModelAttribute User register,
-                                 @ModelAttribute Profile profile,
-                                 @RequestParam("confirmPassword") String confirmPassword,
-                                 HttpSession session
+    public Msg requestRegister(@RequestParam("account") String account,
+                               @RequestParam("password") String password,
+                               @RequestParam("confirmPassword") String confirmPassword,
+                               @RequestParam("name") String name,
+                               @RequestParam("email") String email,
+                               @RequestParam("address") String address,
+                               @RequestParam("phone") String phone,
+                               HttpSession session
     ) {
         Msg msg = new Msg();
-        List<User> users = userRepository.findByAccount(register.getAccount());
-        List<Profile> profiles = profileRepository.findByEmail(profile.getEmail());
+        List<User> users = userRepository.findByAccount(account);
+        List<Profile> profiles = profileRepository.findByEmail(email);
         //驗證帳戶是否重複、密碼是否重複、Email是否重複
         if(users.size()>0)
             msg = new Msg("Failed", "Account is Exists!", "error");
         else if(profiles.size()>0)
             msg = new Msg("Failed", "Email is Used!", "error");
-        else if(profile.getName().equals("") || profile.getEmail().equals("") || profile.getAddress().equals(""))
+        else if(name.equals("") || email.equals("") || address.equals(""))
             msg = new Msg("Failed", "Please check if the field is fill.!", "warning");
-        else if(!StringUtil.validateEmail(profile.getEmail()))
+        else if(!StringUtil.validateEmail(email))
             msg = new Msg("Failed", "Email is Invalid!", "error");
-        else if(!register.getPassword().equals(confirmPassword))
+        else if(!password.equals(confirmPassword))
             msg = new Msg("Failed", "Password is Not Equals!", "error");
         else {
             //建立帳戶
-            register.setPassword(BCrypt.with(BCrypt.Version.VERSION_2Y).hashToString(10, register.getPassword().toCharArray()));    //密碼加密 php_hash加密
-            register.setProfile(profile);
-            profile.setUser(register);                                                                                              //外鍵
+            Profile profile = new Profile(name, email, address, phone);
+            User register = new User(account, password, profile);                                                                                            //外鍵
             userRepository.save(register);  
             msg = new Msg("Successful", "Account is created", "success");                                                                                        //儲存
         }

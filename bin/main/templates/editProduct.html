@@ -20,7 +20,7 @@
                                 <div class="card-body p-0">
                                     <div class="p-5">
 
-                                        <form role="form" id="editProductForm" method="post" enctype="multipart/form-data" th:action="@{/myProducts/requestEditProduct}">
+                                        <form role="form" id="editProductForm" method="post" enctype="multipart/form-data">
                                             <div class="form-group">
                                                 <input type="number" name="id" autofocus="" th:value="${product.id}" hidden="" required=""/>
                                             </div>
@@ -52,9 +52,12 @@
                                                     </div>
                                                 </div>
                                             </div>
-                                            <button type="submit" class="btn btn-primary btn-block rounded-pill form-control-lg mt-3">Save</button>
+                                            <div class="col-12 text-center">
+                                                <button id="deleteBtn" type="button" class="btn btn-danger rounded-pill form-control-lg mt-3 mx-2 px-3">Delete</button>
+                                                <button id="saveBtn" type="button" class="btn btn-aqua rounded-pill form-control-lg mt-3 mx-2 px-3">Save</button>
+                                            </div>
                                         </form>
-                                        
+                                                
                                     </div>
                                 </div>
                             </div>
@@ -67,6 +70,89 @@
         <div layout:fragment="customJs" th:inline="javascript">
             <script>
                 $(function(){
+                    //----------------------------------------Delete----------------------------------------
+                    $("#deleteBtn").click(function () {
+                        Swal.fire({
+                            title: 'Delete?',
+                            html: "Do you want delete this product?",
+                            icon: 'warning',
+                            showCancelButton: true,
+                        }).then(
+                            function (result) {
+                                if(result.value){
+                                    remove();
+                                }
+                            }
+                        );
+                    });
+                    
+                    //--------------------CANCEL FUNCTION--------------------
+                    function remove() {
+                        $('#loading').modal('show');
+                        $('#loading').on('shown.bs.modal', function (event) {
+                            var modal = $(this);
+                            var id = $("input[name='id']").val();
+                            
+                            $("#cancelBtn").prop("disabled", true);
+                            $.ajax({
+                                url : '/myProducts/requestDeleteProduct', 
+                                type : 'post',
+                                async:false, 
+                                data : JSON.stringify({"id":id}),
+                                contentType:'application/json',
+                                dataType : 'json',
+                            }).done(function(response) {
+                                modal.off('shown.bs.modal');
+                                modal.modal("hide");
+                                $("#cancelBtn").prop("disabled", false);
+                                Swal.fire(response['title'], response['text'], response['icon']).then(
+                                    function () {
+                                        location.href = [[@{/myProducts}]];
+                                    }
+                                );
+                            })
+                        })
+                    }
+
+                    //--------------------SAVE FUNCTINO--------------------
+                    $("#saveBtn").click(function (event) {
+                        event.preventDefault();
+                        save();                
+                    });
+                    
+                    function save() {
+                        $('#loading').modal('show');
+                        $('#loading').on('shown.bs.modal', function (event) {
+                            var modal = $(this);
+                            // 取得form
+                            var form = $('#editProductForm')[0];
+                            var data = new FormData(form);
+                            
+                            $("#saveBtn").prop("disabled", true);
+                            $.ajax({
+                                type: "POST",               //使用POST傳輸,檔案上傳只能用POST
+                                enctype: 'multipart/form-data', //將資料加密傳輸 檔案上傳一定要有的屬性
+                                url: "/myProducts/requestEditProduct", //要傳輸對應的接口
+                                data: data,         //要傳輸的資料,我們將form 內upload打包成data
+                                processData: false, //防止jquery將data變成query String
+                                contentType: false, 
+                                cache: false,  //不做快取
+                                async : false  //設為同步
+                            }).done(function(response) {
+                                modal.off('shown.bs.modal');
+                                modal.modal("hide");
+                                $("#saveBtn").prop("disabled", false);
+                                Swal.fire(response['title'], response['text'], response['icon']).then(
+                                    function () {
+                                        if(response['title']=="Successful") location.href = [[@{/myProducts}]];
+                                        else location.href = [[@{/myProducts/} + ${product.id}]];
+                                    }
+                                );
+                            })
+                        })
+                    }
+
+                    //--------------------FILE--------------------
                     //選擇檔案時
                     $("#inputFile").change(function(event) { 
                         readURL(this);

@@ -2,6 +2,8 @@ package com.satw.demo.Model;
 
 import java.util.Date;
 
+import javax.persistence.Access;
+import javax.persistence.AccessType;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -17,14 +19,13 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Transient;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.google.gson.annotations.Expose;
 import com.satw.demo.Controller.NotificationController;
 import com.satw.demo.Controller.OrderController;
 
 @Entity
 @Table(name = "orders")
+@Access(AccessType.FIELD)
 public class Order {    
     //------------------------------------DB Columns------------------------------------
     //Primary Key
@@ -45,14 +46,14 @@ public class Order {
     @Column(name="quantity")
     @Expose
     private int quantity;
-    @Transient
-    private State state;
-    @Column(name="productShot", columnDefinition="TEXT")
+    @Column(name="price")
     @Expose
-    private String productShot;
+    private int price;
     @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER, mappedBy = "order")
     @Expose
     private Coupon coupon;
+    @Transient
+    private State state;
 
     //Timestamp
     @Temporal(TemporalType.TIMESTAMP)
@@ -65,7 +66,8 @@ public class Order {
     private Date updateTime;
 
     //DB's Representing
-    @Column(name="stateType", columnDefinition="TEXT")
+    @Column(name="state_type", columnDefinition="TEXT")
+    @Access(AccessType.PROPERTY)
     @Expose
     private String stateType;
 
@@ -73,10 +75,9 @@ public class Order {
     //Constructor
     public Order(){}
     public Order(Product product, User buyer, int quantity, Coupon coupon) {
-        Gson gson = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().create();
         this.product = product;
-        this.productShot = gson.toJson(product);
         this.buyer = buyer;
+        this.price = product.getPrice();
         this.quantity = quantity;
         this.coupon = coupon;
         this.setState(new Ordered());
@@ -87,51 +88,26 @@ public class Order {
         return id;
     }
     public Product getProduct(){
-        Gson gson = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().create();
-        return gson.fromJson(productShot, Product.class);
-    }
-    public void setProduct(Product product){
-        Gson gson = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().create();
-        this.product = product;
-        if(this.productShot==null) this.productShot = gson.toJson(product);
+        return this.product;
     }
     public User getBuyer(){
         return buyer;
     }
-    public void setBuyer(User buyer){
-        this.buyer = buyer;
+    public int getPrice(){
+        return price;
     }
     public int getQuantity(){
         return quantity;
     }
-    public void setQuantity(int quantity){
-        this.quantity = quantity;
-    }
-    public String getStateType(){
-        return stateType;
-    }
-    public void setStateType(String stateType){
-        this.stateType = stateType;
-        try {
-            Class<?> clazz = Class.forName("com.satw.demo.Model."+stateType);
-            this.state = (State) clazz.getDeclaredConstructor().newInstance();
-        } catch (Exception e) {
-            System.err.println(e);
-        }
+    public Coupon getCoupon(){
+        return coupon;
     }
     public State getState(){
-        setStateType(this.stateType);
         return state;
     }
     public void setState(State state){
         this.state = state;
-        this.stateType = state.getStateType();
-    }
-    public Coupon getCoupon(){
-        return coupon;
-    }
-    public void setCoupon(Coupon coupon){
-        this.coupon = coupon;
+        this.stateType = state.getType();
     }
 
     //Timestamp Getter Setter
@@ -143,21 +119,35 @@ public class Order {
     }
     
     //Other DB's Relationships Setter
+    public String getStateType(){
+        return stateType;
+    }
+    public void setStateType(String stateType){
+        this.stateType = stateType;
+        setStateFromStateType();
+    }
+    public void setStateFromStateType(){
+        try {
+            Class<?> clazz = Class.forName("com.satw.demo.Model."+stateType);
+            this.state = (State) clazz.getDeclaredConstructor().newInstance();
+        } catch (Exception e) {
+            System.err.println(e);
+        }
+    }
 
     //Operator
     public Msg updateState(OrderController orderController, User loginUser) {
-        setStateType(this.stateType);
 		return state.update(this, orderController, loginUser);
     }
     public int getAmount(){
-        return getProduct().getPrice() * quantity;
+        return price * quantity;
     }
     public int getPayableAmount(){
         int discount = coupon==null? 0: coupon.getDiscount();
-        return Math.max(0, getProduct().getPrice() * quantity - discount);
+        return Math.max(0, price * quantity - discount);
     }
     public String getDetail(){
-        String s = getProduct().getTitle()+" ($" + getProduct().getPrice() + ") * " + quantity + "\n";
+        String s = product.getTitle()+" ($" + price + ") * " + quantity + "\n";
         s += "Amount = " + getAmount() + "\n";
         s += "Discount = -" + getCouponDiscount() + "\n";
         s += "Payable = " + getPayableAmount();
@@ -174,24 +164,39 @@ public class Order {
     }
 
     //Mediator
+    //product
     public int getProductId(){
-        return getProduct().getId();
-    }
-    public User getProductSeller(){
-        return getProduct().getSeller();
+        return product.getId();
     }
     public String getProductTitle(){
-        return getProduct().getTitle();
+        return product.getTitle();
     }
     public String getProductDescription(){
-        return getProduct().getDescription();
+        return product.getDescription();
     }
     public int getProductPrice(){
-        return getProduct().getPrice();
+        return price;
     }
     public String getProductImgs(){
         return product.getImgs();
     }
+    public User getProductSeller(){
+        return product.getSeller();
+    }
+    public int getProductSellerId(){
+        return product.getSellerId();
+    }
+    public String getProductSellerWalletAddress(){
+        return product.getSellerWalletAddress();
+    }
+    //buyer
+    public int getBuyerId(){
+        return buyer.getId();
+    }
+    public String getBuyerWalletAddress(){
+        return buyer.getWalletAddress();
+    }
+    //coupon
     public String getCouponCode(){
         return coupon==null? "": coupon.getCode();
     }

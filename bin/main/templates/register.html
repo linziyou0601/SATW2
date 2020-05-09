@@ -23,11 +23,11 @@
                                         <form role="form" id="registerForm" method="post" enctype="multipart/form-data">
                                             <div class="form-group">
                                                 <label for="account">Account</label>
-                                                <input class="form-control rounded-pill form-control-lg" placeholder="account" id="account" th:field="${register.account}" type="text" autofocus="" required=""/>
+                                                <input class="form-control rounded-pill form-control-lg" placeholder="account" id="account" name="account" type="text" autofocus="" required=""/>
                                             </div>
                                             <div class="form-group">
                                                 <label for="password">Password</label>
-                                                <input class="form-control rounded-pill form-control-lg" placeholder="password" id="password" th:field="${register.password}" type="password" autofocus="" required=""/>
+                                                <input class="form-control rounded-pill form-control-lg" placeholder="password" id="password" name="password" type="password" autofocus="" required=""/>
                                             </div>
                                             <div class="form-group">
                                                 <label for="confirmPassword">Confirm Password</label>
@@ -35,19 +35,19 @@
                                             </div>
                                             <div class="form-group">
                                                 <label for="Name">Name</label>
-                                                <input class="form-control rounded-pill form-control-lg" placeholder="name" id="name" th:field="${profile.name}" type="text" autofocus="" required=""/>
+                                                <input class="form-control rounded-pill form-control-lg" placeholder="name" id="name" name="name" type="text" autofocus="" required=""/>
                                             </div>
                                             <div class="form-group">
                                                 <label for="Email">Email</label>
-                                                <input class="form-control rounded-pill form-control-lg" placeholder="email" id="email" th:field="${profile.email}" type="text" autofocus="" required=""/>
+                                                <input class="form-control rounded-pill form-control-lg" placeholder="email" id="email" name="email" type="text" autofocus="" required=""/>
                                             </div>
                                             <div class="form-group">
                                                 <label for="Address">Address</label>
-                                                <input class="form-control rounded-pill form-control-lg" placeholder="address" id="address" th:field="${profile.address}" type="text" autofocus="" required=""/>
+                                                <input class="form-control rounded-pill form-control-lg" placeholder="address" id="address" name="address" type="text" autofocus="" required=""/>
                                             </div>
                                             <div class="form-group">
                                                 <label for="Phone">Phone</label>
-                                                <input class="form-control rounded-pill form-control-lg" placeholder="phone" id="phone" th:field="${profile.phone}" type="text" autofocus=""/>
+                                                <input class="form-control rounded-pill form-control-lg" placeholder="phone" id="phone" name="phone" type="text" autofocus=""/>
                                             </div>
                                             <button id="submitBtn" type="submit" class="btn btn-primary btn-block rounded-pill form-control-lg">Sign Up</button>
                                         </form>

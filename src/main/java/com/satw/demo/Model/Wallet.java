@@ -7,7 +7,6 @@ import static com.satw.demo.Util.KeyPairUtil.publicKeyToAddress;
 import java.security.Key;
 import java.security.PublicKey;
 import java.util.Collections;
-import java.util.Date;
 import java.util.LinkedList;
 import java.util.Map;
 
@@ -20,8 +19,6 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
 
 import com.google.gson.annotations.Expose;
 import com.satw.demo.Blockchain.Block;
@@ -53,16 +50,6 @@ public class Wallet{
     @Column(name="address", columnDefinition="TEXT")
     @Expose
     private String address;
-
-    //Timestamp
-    @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = "createTime",  updatable = false, columnDefinition="TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
-    @Expose
-    private Date createTime;
-    @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = "updateTime",  updatable = false, columnDefinition="TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")
-    @Expose
-    private Date updateTime;
     
     //Other DB's Relationships
     @OneToOne(fetch = FetchType.EAGER, optional = false)
@@ -85,28 +72,11 @@ public class Wallet{
     public String getPublicKey(){
         return publicKey;
     }
-    public void setPublic(String publicKey){
-        this.publicKey = publicKey;
-    }
     public String getPrivateKey(){
         return privateKey;
     }
-    public void setPrivateKey(String privateKey){
-        this.privateKey = privateKey;
-    }
     public String getAddress(){
         return address;
-    }
-    public void setAddress(String address){
-        this.address = address;
-    }
-
-    //Timestamp Getter Setter
-    public Date getCreateTime(){
-        return createTime;
-    }
-    public Date getUpdateTime(){
-        return updateTime;
     }
     
     //Other DB's Relationships Setter
@@ -177,7 +147,7 @@ public class Wallet{
         LinkedList<TransactionInput> inputs = new LinkedList<>();
         int ownUTXOs = 0;
         String payerAddress = address;
-        String receiverAddress = order.getState() instanceof Ordered? Blockchain.getThirdParty().getWalletAddress(): order.getProduct().getSeller().getWalletAddress();
+        String receiverAddress = order.getState() instanceof Ordered? Blockchain.getThirdParty().getWalletAddress(): order.getProductSellerWalletAddress();
         int amount = order.getState() instanceof Ordered? order.getPayableAmount(): order.getAmount();
 
         //驗證餘額是否足夠本次交易，並更新UTXO
@@ -197,7 +167,7 @@ public class Wallet{
 
         //初步驗證無誤
         if(txCheck){
-            String detail = order.getProduct().getTitle() + " ($" + order.getProduct().getPrice() + ") × " + order.getQuantity() + " - Discount($" + order.getCouponDiscount() + ") = " + order.getPayableAmount();
+            String detail = order.getProductTitle() + " ($" + order.getPrice() + ") × " + order.getQuantity() + " - Discount($" + order.getCouponDiscount() + ") = " + order.getPayableAmount();
             Transaction transaction = new Payment(publicKey, payerAddress, receiverAddress, order.getId(), detail, amount, inputs);
             transaction.generateSignature(privateKey);
             return transaction;

@@ -82,7 +82,7 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <span class="badge badge-pill badge-primary orderState" th:text="${order.stateType}"></span>
+                                    <span class="badge badge-pill badge-primary orderState" th:text="${order.getStateType()}"></span>
                                 </div>
                             </div>
                         </div>
@@ -169,8 +169,8 @@
                     $("#updateBtn").click(function () {
                         location.href = [[@{/wallet/makePayment/} + ${order.id}]];
                     });
-                  })
-                </script>
+                })
+            </script>
         </div>
     </body>
 </html>

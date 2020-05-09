@@ -1,11 +1,11 @@
 package com.satw.demo.Controller;
 
+import static com.satw.demo.Util.StringUtil.generateCouponCode;
+import static com.satw.demo.Util.StringUtil.generateCouponDiscount;
+
 import java.io.File;
 import java.io.FileInputStream;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -23,8 +23,6 @@ import com.satw.demo.Model.Coupon;
 import com.satw.demo.Model.Order;
 import com.satw.demo.Model.Product;
 import com.satw.demo.Model.User;
-import static com.satw.demo.Util.StringUtil.generateCouponCode;
-import static com.satw.demo.Util.StringUtil.generateCouponDiscount;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;

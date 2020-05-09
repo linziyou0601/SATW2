@@ -49,6 +49,9 @@ public class Product{
     @Column(name="stockQty")
     @Expose
     private int stockQty;
+    @Column(name="deleted")
+    @Expose
+    private boolean deleted;
 
     //Timestamp
     @Temporal(TemporalType.TIMESTAMP)
@@ -74,6 +77,7 @@ public class Product{
         this.price = price;
         this.imgs = imgs;
         this.stockQty = stockQty;
+        this.deleted = false;
     }
 
     //Getter Setter
@@ -82,9 +86,6 @@ public class Product{
     }
     public User getSeller(){
         return seller;
-    }
-    public void setSeller(User seller){
-        this.seller = seller;
     }
     public String getTitle(){
         return title;
@@ -116,6 +117,12 @@ public class Product{
     public void setStockQty(int stockQty){
         this.stockQty = stockQty;
     }
+    public boolean getDeleted(){
+        return deleted;
+    }
+    public void setDeleted(boolean deleted){
+        this.deleted = deleted;
+    }
 
     //Timestamp Getter Setter
     public Date getCreateTime(){
@@ -137,5 +144,13 @@ public class Product{
     }
     public void addStockQty(int quantity){
         this.stockQty += quantity;
+    }
+
+    //Mediator
+    public int getSellerId(){
+        return seller.getId();
+    }
+    public String getSellerWalletAddress(){
+        return seller.getWalletAddress();
     }
 }

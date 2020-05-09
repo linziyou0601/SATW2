@@ -1,5 +1,12 @@
 package com.satw.demo.Util;
 
+import static com.satw.demo.Util.StringUtil.RipeMD160;
+import static com.satw.demo.Util.StringUtil.SHA256;
+import static com.satw.demo.Util.StringUtil.base58Decode;
+import static com.satw.demo.Util.StringUtil.base58Encode;
+import static com.satw.demo.Util.StringUtil.base64Decode;
+import static com.satw.demo.Util.StringUtil.base64Encode;
+
 import java.security.Key;
 import java.security.KeyFactory;
 import java.security.KeyPair;
@@ -10,10 +17,8 @@ import java.security.SecureRandom;
 import java.security.Signature;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
-import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
-import static com.satw.demo.Util.StringUtil.*;
 
 public class KeyPairUtil {
     public static Map<String, Key> generateKeyPair() {

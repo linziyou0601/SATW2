@@ -34,7 +34,7 @@
                                                     <span th:if="${order.getAmount()!=order.getPayableAmount()}" style="font-size: 1.6rem;" class=""><del th:text="${order.getAmount()}"></del></span>
                                                     <span th:if="${order.getAmount()!=order.getPayableAmount()}" style="font-size: 1.8rem;" class="font-weight-bold" th:text="${order.getPayableAmount()}"></span>
                                                     <span style="font-size: 1rem;" class="font-weight-bold" th:text="'($'+${order.getProductPrice()}+'×'+${order.quantity}+')'"></span>
-                                                    <span style="font-size: 1.2rem;" class="ml-2 badge badge-pill badge-primary" th:text="${order.stateType}"></span>
+                                                    <span style="font-size: 1.2rem;" class="ml-2 badge badge-pill badge-primary" th:text="${order.getStateType()}"></span>
                                                 </div>
 
                                                 <!--Description-->
@@ -63,10 +63,10 @@
                                                         </div>
                                                     </div>
                                                     <div class="col-6" th:if="${session.user != null}">
-                                                        <button th:if="${order.stateType=='Ordered' and order.buyer.id == session.user.id}" id="payBtn" class="btn btn-block btn-outline-aqua mt-0 rounded-pill">Pay</button>
-                                                        <button th:if="${order.stateType=='Ordered'}" id="cancelBtn" class="btn btn-block btn-outline-secondary mt-3 rounded-pill">Cancel</button>
-                                                        <button th:if="${order.stateType=='Placed' and order.getProductSeller().id == session.user.id}"id="shipBtn" class="btn btn-block btn-outline-aqua mt-0 rounded-pill">Shipped</button>
-                                                        <button th:if="${order.stateType=='Shipped' and order.buyer.id == session.user.id}" id="receiveBtn" class="btn btn-block btn-outline-aqua mt-0 rounded-pill">Received</button>
+                                                        <button th:if="${order.getStateType()=='Ordered' and order.buyer.id == session.user.id}" id="payBtn" class="btn btn-block btn-outline-aqua mt-0 rounded-pill">Pay</button>
+                                                        <button th:if="${order.getStateType()=='Ordered'}" id="cancelBtn" class="btn btn-block btn-outline-secondary mt-3 rounded-pill">Cancel</button>
+                                                        <button th:if="${order.getStateType()=='Placed' and order.getProductSeller().id == session.user.id}"id="shipBtn" class="btn btn-block btn-outline-aqua mt-0 rounded-pill">Shipped</button>
+                                                        <button th:if="${order.getStateType()=='Shipped' and order.buyer.id == session.user.id}" id="receiveBtn" class="btn btn-block btn-outline-aqua mt-0 rounded-pill">Received</button>
                                                     </div>
                                                     <form id="orderForm" class="form my-2 my-lg-0 mr-auto" hidden="">
                                                         <div class="form-group">

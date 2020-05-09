@@ -66,7 +66,10 @@ public class ProductController {
     //-------------------產品下訂-------------------//
     @PostMapping("requestOrder")
     @ResponseBody
-    public Msg requestOrder(@RequestParam("id") int id, @RequestParam("quantity") int quantity, @RequestParam("couponCode") String couponCode, HttpSession session) {
+    public Msg requestOrder(@RequestParam("id") int id, 
+                            @RequestParam("quantity") int quantity, 
+                            @RequestParam("couponCode") String couponCode, 
+                            HttpSession session) {
         User user = (User) session.getAttribute("user");
         List<Product> products = productRepository.findById(id);
         if(user==null){

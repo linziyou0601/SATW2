@@ -1,6 +1,5 @@
 package com.satw.demo.Model;
 
-import java.util.Date;
 import java.util.LinkedList;
 import java.util.Set;
 
@@ -14,8 +13,6 @@ import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
 
 import com.google.gson.annotations.Expose;
 import com.satw.demo.Blockchain.Transaction;
@@ -43,16 +40,6 @@ public class User{
     private Profile profile;
     @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER, mappedBy = "user")
     private Wallet wallet;
-
-    //Timestamp
-    @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = "createTime",  updatable = false, columnDefinition="TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
-    @Expose
-    private Date createTime;
-    @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = "updateTime",  updatable = false, columnDefinition="TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")
-    @Expose
-    private Date updateTime;
     
     //Other DB's Relationships
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, mappedBy = "seller")
@@ -66,9 +53,11 @@ public class User{
         this.wallet = new Wallet();
         this.wallet.setUser(this);
     }
-    public User(String account, String password) {
+    public User(String account, String password, Profile profile) {
         this.account = account;
-        this.password = password;
+        this.password = BCrypt.with(BCrypt.Version.VERSION_2Y).hashToString(10, password.toCharArray());
+        this.profile = profile;
+        this.profile.setUser(this);
         this.wallet = new Wallet();
         this.wallet.setUser(this);
     }
@@ -80,34 +69,17 @@ public class User{
     public String getAccount(){
         return account;
     }
-    public void setAccount(String account){
-        this.account = account;
-    }
     public String getPassword(){
         return password;
     }
     public void setPassword(String password){
-        this.password = password;
+        this.password = BCrypt.with(BCrypt.Version.VERSION_2Y).hashToString(10, password.toCharArray());
     }
     public Profile getProfile(){
         return profile;
     }
-    public void setProfile(Profile profile){
-        this.profile = profile;
-    }
     public Wallet getWallet(){
         return wallet;
-    }
-    public void setWallet(Wallet wallet){
-        this.wallet = wallet;
-    }
-
-    //Timestamp Getter Setter
-    public Date getCreateTime(){
-        return createTime;
-    }
-    public Date getUpdateTime(){
-        return updateTime;
     }
 
     //Operator

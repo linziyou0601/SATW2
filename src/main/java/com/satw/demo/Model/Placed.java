@@ -3,7 +3,7 @@ package com.satw.demo.Model;
 import com.satw.demo.Controller.OrderController;
 
 public class Placed implements State {
-	private final String stateType = "Placed";
+	private final String type = "Placed";
 	public Msg update(Order order, OrderController orderController, User loginUser){
 		Msg msg = new Msg();
 		if(loginUser==null){
@@ -18,7 +18,7 @@ public class Placed implements State {
         }
 		return msg;
 	}
-	public String getStateType(){
-		return stateType;
+	public String getType(){
+		return type;
 	};
 }

@@ -20,7 +20,7 @@
                             <a th:href="@{/myOrders/} + ${order.id}" class="text-decoration-none">
                                 <div class="card o-hidden my-2 rounded shadow-sm border border-right">
                                     <div class="card-body p-0">
-                                        <span class="badge badge-pill badge-primary orderState" th:text="${order.stateType}"></span>
+                                        <span class="badge badge-pill badge-primary orderState" th:text="${order.getStateType()}"></span>
                                         <div class="row justify-content-center align-items-center text-center">
                                             <div th:style="'width:160px; height:160px; background: url('+${order.getProductImgs()}+') no-repeat center center; background-size: cover;'"></div>
                                         </div>
