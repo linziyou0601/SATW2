@@ -136,13 +136,13 @@ Listen 80
 <VirtualHost *:4567>
     # 開啟SSL
     SSLEngine On
-    SSLCertificateFile /etc/letsencrypt/live/linziyou.nctu.me/cert.pem
-    SSLCertificateKeyFile /etc/letsencrypt/live/linziyou.nctu.me/privkey.pem
-    SSLCertificateChainFile /etc/letsencrypt/live/linziyou.nctu.me/fullchain.pem
-    ServerName linziyou.nctu.me:4567
-    ServerAlias linziyou.nctu.me
+    SSLCertificateFile /etc/letsencrypt/live/satw2.linziyou.nctu.me/cert.pem
+    SSLCertificateKeyFile /etc/letsencrypt/live/satw2.linziyou.nctu.me/privkey.pem
+    SSLCertificateChainFile /etc/letsencrypt/live/satw2.linziyou.nctu.me/fullchain.pem
+    ServerName satw2.linziyou.nctu.me:4567
+    ServerAlias satw2.linziyou.nctu.me
     # 代理設定
-    ProxyPass / unix:/var/www/coolpanda/uwsgi/uwsgi.sock|uwsgi://127.0.0.1:5000/
+    ProxyPass / unix:/var/www/satw2bot/uwsgi/uwsgi.sock|uwsgi://127.0.0.1:5000/
 </VirtualHost>
 ```
 
