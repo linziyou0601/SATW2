@@ -229,7 +229,7 @@ WantedBy=multi-user.target
     sudo systemctl disable satw2t.service # stops autostart
     sudo systemctl stop satw2.service     # stops the service
     sudo systemctl restart satw2.service  # restarts the service
-    sudo journalctl -u satw2.service      # check all status
+    sudo journalctl -f -u satw2.service      # check all status
 
 ------------
 
