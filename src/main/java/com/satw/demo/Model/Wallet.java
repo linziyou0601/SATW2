@@ -159,13 +159,10 @@ public class Wallet{
             }
             if(ownUTXOs > amount) break;
         }
-        //驗證餘額是否足夠本次交易
-        if(ownUTXOs < amount) {
-            System.out.println("[x] 餘額不足，本次交易取消。"); //prompt
-            txCheck = false;
-        }
+        //再次驗證餘額是否足夠本次交易
+        txCheck = (ownUTXOs >= amount);
 
-        //初步驗證無誤
+        //驗證無誤
         if(txCheck){
             String detail = order.getProductTitle() + " ($" + order.getPrice() + ") × " + order.getQuantity() + " - Discount($" + order.getCouponDiscount() + ") = " + order.getPayableAmount();
             Transaction transaction = new Payment(publicKey, payerAddress, receiverAddress, order.getId(), detail, amount, inputs);
