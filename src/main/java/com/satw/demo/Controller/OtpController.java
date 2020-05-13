@@ -42,22 +42,27 @@ public class OtpController {
                 msg = new Msg("Error", "Invalid operation.", "error");
             } else {
                 ValidState state = otp.verifyOtp(otpCode);
-                if(state == ValidState.CORRECT) {
-                    Transaction tx = (Transaction) session.getAttribute("newTx");
-                    Blockchain.addUnveriedTransaction(tx);
-                    msg = new Msg("Successful", "Your transaction "+tx.getDetail()+" has sent to blockchain.", "success");
-                    session.removeAttribute("newTx");
-                    session.removeAttribute("otp");
-                } else if(state == ValidState.OVERTRIES) {
-                    msg = new Msg("Error", "Retry over 3 times. Canceling the transaction.", "error");
-                    session.removeAttribute("newTx");
-                    session.removeAttribute("otp");
-                } else if(state == ValidState.EXPIRED) {
-                    msg = new Msg("Failed", "Expired otp. Reseding the new one to your email.", "warning");
-                    session.setAttribute("otp", otp);
-                } else {
-                    msg = new Msg("Failed", "Incorrect otp.", "warning");
-                    session.setAttribute("otp", otp);
+                switch(state){
+                    case CORRECT:
+                        Transaction tx = (Transaction) session.getAttribute("newTx");
+                        Blockchain.addUnveriedTransaction(tx);
+                        msg = new Msg("Successful", "Your transaction "+tx.getDetail()+" has sent to blockchain.", "success");
+                        session.removeAttribute("newTx");
+                        session.removeAttribute("otp");
+                        break;
+                    case OVERTRIES:
+                        msg = new Msg("Error", "Retry over 3 times. Canceling the transaction.", "error");
+                        session.removeAttribute("newTx");
+                        session.removeAttribute("otp");
+                        break;
+                    case EXPIRED:
+                        msg = new Msg("Failed", "Expired otp. Reseding the new one to your email.", "warning");
+                        session.setAttribute("otp", otp);
+                        break;
+                    case INCORRECT:
+                        msg = new Msg("Failed", "Incorrect otp.", "warning");
+                        session.setAttribute("otp", otp);
+                        break;
                 }
             }
         }

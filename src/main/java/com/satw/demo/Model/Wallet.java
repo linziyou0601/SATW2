@@ -125,16 +125,11 @@ public class Wallet{
                 inputs.add(new TransactionInput(UTXO.getHash()));
                 ownUTXOs += UTXO.getAmount();
             }
-            if(ownUTXOs > amount) break;
+            if(ownUTXOs >= amount) break;
         }
+        
         //驗證餘額是否足夠本次交易
-        if(ownUTXOs < amount) {
-            System.out.println("[x] 餘額不足，本次交易取消。"); //prompt
-            txCheck = false;
-        }
-
-        //初步驗證無誤
-        if(txCheck){
+        if(ownUTXOs >= amount){
             Transaction transaction = new Withdraw(publicKey, address, amount, inputs);
             transaction.generateSignature(privateKey);
             return transaction;
@@ -143,7 +138,6 @@ public class Wallet{
     }
     public Transaction payment(Order order){
         Blockchain.updateChain();
-        boolean txCheck = true;
         LinkedList<TransactionInput> inputs = new LinkedList<>();
         int ownUTXOs = 0;
         String payerAddress = address;
@@ -157,13 +151,11 @@ public class Wallet{
                 inputs.add(new TransactionInput(UTXO.getHash()));
                 ownUTXOs += UTXO.getAmount();
             }
-            if(ownUTXOs > amount) break;
+            if(ownUTXOs >= amount) break;
         }
-        //再次驗證餘額是否足夠本次交易
-        txCheck = (ownUTXOs >= amount);
 
-        //驗證無誤
-        if(txCheck){
+        //驗證餘額是否足夠本次交易
+        if(ownUTXOs >= amount){
             String detail = order.getProductTitle() + " ($" + order.getPrice() + ") × " + order.getQuantity() + " - Discount($" + order.getCouponDiscount() + ") = " + order.getPayableAmount();
             Transaction transaction = new Payment(publicKey, payerAddress, receiverAddress, order.getId(), detail, amount, inputs);
             transaction.generateSignature(privateKey);
