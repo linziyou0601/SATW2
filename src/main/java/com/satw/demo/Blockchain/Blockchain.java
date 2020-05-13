@@ -43,6 +43,7 @@ public class Blockchain {
 
     // TIRDPARTY
     public static User getThirdParty(){ return blockchain.userController.getThirdParty(); }
+    public static String getThirdPartyWalletAddress(){ return blockchain.userController.getThirdParty().getWalletAddress(); }
 
     // UTXOs
     public static HashMap<String, TransactionOutput> getUTXOs(){ return blockchain.UTXOs; }

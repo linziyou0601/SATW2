@@ -147,7 +147,7 @@ public class Wallet{
         LinkedList<TransactionInput> inputs = new LinkedList<>();
         int ownUTXOs = 0;
         String payerAddress = address;
-        String receiverAddress = order.getState() instanceof Ordered? Blockchain.getThirdParty().getWalletAddress(): order.getProductSellerWalletAddress();
+        String receiverAddress = order.getState() instanceof Ordered? Blockchain.getThirdPartyWalletAddress(): order.getProductSellerWalletAddress();
         int amount = order.getState() instanceof Ordered? order.getPayableAmount(): order.getAmount();
 
         //驗證餘額是否足夠本次交易，並更新UTXO
