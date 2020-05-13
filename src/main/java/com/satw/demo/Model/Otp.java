@@ -1,7 +1,7 @@
 package com.satw.demo.Model;
 
-import static com.satw.demo.Util.EmailUtil.sendEmail;
-import static com.satw.demo.Util.StringUtil.generateOtp;
+import com.satw.demo.Util.EmailUtil;
+import com.satw.demo.Util.StringUtil;
 
 import java.time.Instant;
 
@@ -16,14 +16,14 @@ public class Otp {
     private int retryTimes;
     private String email;
     public Otp(String email){
-        this.otp = generateOtp();
+        this.otp = StringUtil.generateOtp();
         this.expiredTime = Instant.now().getEpochSecond() + 300;
         this.retryTimes = 0;
         this.email = email;
     }
 
     public boolean send(){
-        return sendEmail(otp, email);
+        return EmailUtil.sendEmail(otp, email);
     }
 
     public ValidState verifyOtp(String otp){
@@ -38,7 +38,7 @@ public class Otp {
     		state = ValidState.OVERTRIES;
         }
         if(state == ValidState.EXPIRED){
-            this.otp = generateOtp();
+            this.otp = StringUtil.generateOtp();
             this.expiredTime = Instant.now().getEpochSecond() + 300;
             send();
         }
