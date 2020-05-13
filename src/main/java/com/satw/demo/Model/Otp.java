@@ -40,7 +40,7 @@ public class Otp {
         if(state == ValidState.EXPIRED){
             this.otp = generateOtp();
             this.expiredTime = Instant.now().getEpochSecond() + 300;
-            sendEmail(this.otp, this.email);
+            send();
         }
     	return state;
     }
