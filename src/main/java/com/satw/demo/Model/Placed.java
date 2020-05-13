@@ -9,7 +9,7 @@ public class Placed implements State {
 		if(loginUser==null){
             msg = new Msg("Error", "Invalid operation.", "error");
         } else {
-			if(order.getProductSeller().getId() == loginUser.getId()){
+			if(order.getProductSellerId() == loginUser.getId()){
 				order.setState(new Shipped());  //狀態更新為已出貨
 				msg = new Msg("Successful", "Order state has updated.", "success");
 			} else {
