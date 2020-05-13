@@ -89,7 +89,7 @@ public class Wallet{
         Blockchain.updateChain();
         int total = 0;
         for(TransactionOutput UTXO: Blockchain.getUTXOs().values())
-            if(UTXO.verifyOwner(user.getWalletAddress()))
+            if(UTXO.verifyOwner(address))
                 total += UTXO.getAmount();
         return total;
     }
@@ -97,10 +97,10 @@ public class Wallet{
         LinkedList<Transaction> txs = new LinkedList<>();
         for(Block block: Blockchain.getChain())
             for(Transaction tx: block.getTransactions()){
-                if((tx.getClassType().equals("Payment") && ((Payment)tx).getPayerAddress().equals(user.getWalletAddress())) ||
-                   (tx.getClassType().equals("Payment") && ((Payment)tx).getReceiverAddress().equals(user.getWalletAddress())) ||
-                   (tx.getClassType().equals("Withdraw") && ((Withdraw)tx).getPayerAddress().equals(user.getWalletAddress())) ||
-                   (tx.getClassType().equals("Deposit") && ((Deposit)tx).getReceiverAddress().equals(user.getWalletAddress())))
+                if((tx.getClassType().equals("Payment") && ((Payment)tx).getPayerAddress().equals(address)) ||
+                   (tx.getClassType().equals("Payment") && ((Payment)tx).getReceiverAddress().equals(address)) ||
+                   (tx.getClassType().equals("Withdraw") && ((Withdraw)tx).getPayerAddress().equals(address)) ||
+                   (tx.getClassType().equals("Deposit") && ((Deposit)tx).getReceiverAddress().equals(address)))
                     txs.add(tx);
             }
         Collections.reverse(txs);
@@ -108,7 +108,7 @@ public class Wallet{
     }
     public Transaction deposit(int amount){
         Blockchain.updateChain();
-        Transaction transaction = new Deposit(publicKey, user.getWalletAddress(), amount);
+        Transaction transaction = new Deposit(publicKey, address, amount);
         transaction.generateSignature(privateKey);
         return transaction;
     }
@@ -121,7 +121,7 @@ public class Wallet{
         //驗證餘額是否足夠本次交易，並更新UTXO
         //取得部分UTXO直到足夠支付本次交易的輸出
         for(TransactionOutput UTXO: Blockchain.getUTXOs().values()){
-            if(UTXO.verifyOwner(user.getWalletAddress())){
+            if(UTXO.verifyOwner(address)){
                 inputs.add(new TransactionInput(UTXO.getHash()));
                 ownUTXOs += UTXO.getAmount();
             }
@@ -135,7 +135,7 @@ public class Wallet{
 
         //初步驗證無誤
         if(txCheck){
-            Transaction transaction = new Withdraw(publicKey, user.getWalletAddress(), amount, inputs);
+            Transaction transaction = new Withdraw(publicKey, address, amount, inputs);
             transaction.generateSignature(privateKey);
             return transaction;
         }
