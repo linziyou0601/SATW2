@@ -114,7 +114,6 @@ public class Wallet{
     }
     public Transaction withdraw(int amount){
         Blockchain.updateChain();
-        boolean txCheck = true;
         LinkedList<TransactionInput> inputs = new LinkedList<>();
         int ownUTXOs = 0;
 
