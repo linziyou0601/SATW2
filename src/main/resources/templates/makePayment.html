@@ -118,6 +118,10 @@
                             <div class="mt-4 font-weight-bold text-light">Private Key</div>
                             <hr style="max-width: 50px; border-top: 2px solid #FFF;" class="ml-0 mt-1 mb-1"/>
                             <div class="mt-1 text-light text-monospace text-break" th:text="${session.user.getWalletPrivateKey()}"></div>
+
+                            <div class="mt-4 font-weight-bold text-light">Wallet Address</div>
+                            <hr style="max-width: 50px; border-top: 2px solid #FFF;" class="ml-0 mt-1 mb-1"/>
+                            <div class="mt-1 text-light text-monospace text-break" th:text="${session.user.getWalletAddress()}"></div>
                         </div>
                     </div>
                 </div>
