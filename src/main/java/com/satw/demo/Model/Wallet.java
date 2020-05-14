@@ -155,7 +155,7 @@ public class Wallet{
 
         //驗證餘額是否足夠本次交易
         if(ownUTXOs >= amount){
-            String detail = order.getProductTitle() + " ($" + order.getPrice() + ") × " + order.getQuantity() + " - Discount($" + order.getCouponDiscount() + ") = " + order.getPayableAmount();
+            String detail = order.getDetail();
             Transaction transaction = new Payment(publicKey, payerAddress, receiverAddress, order.getId(), detail, amount, inputs);
             transaction.generateSignature(privateKey);
             return transaction;
