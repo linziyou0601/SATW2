@@ -38,21 +38,21 @@ public class Blockchain {
     }
 
     //------------------------------------Attributes------------------------------------
-    public int DIFFICULTY = 3;
+    public final int DIFFICULTY = 3;
     private LinkedList<Block> chain = new LinkedList<>();
     private HashMap<String, TransactionOutput> UTXOs = new HashMap<>();
 
     //------------------------------------Methods------------------------------------
-    // ------------------TIRDPARTY------------------
+    // Third Party
     public static User getThirdParty(){ return blockchain.userRepository.findFirstById(1); }
     public static String getThirdPartyWalletAddress(){ return getThirdParty().getWalletAddress(); }
 
-    // ------------------UTXOs------------------
+    // UTXOs
     public static HashMap<String, TransactionOutput> getUTXOs(){ return blockchain.UTXOs; }
     public static void putUTXOs(String key, TransactionOutput transactionOutput){ blockchain.UTXOs.put(key, transactionOutput); }
     public static void removeUTXOs(String key){ blockchain.UTXOs.remove(key); }
     
-    // ------------------BALANCE------------------
+    // GET INFOMATION BY WALLET ADDRESS
     public static int getBalance(String address){
         updateChain();
         int total = 0;
@@ -64,7 +64,6 @@ public class Blockchain {
     public static LinkedList<TransactionInput> getTxInputs(String address, int amount){
         LinkedList<TransactionInput> inputs = new LinkedList<>();
         int ownUTXOs = 0;
-        //驗證餘額是否足夠本次交易，並更新UTXO
         //取得部分UTXO直到足夠支付本次交易的輸出
         for(TransactionOutput UTXO: blockchain.UTXOs.values()){
             if(UTXO.verifyOwner(address)){
@@ -85,12 +84,11 @@ public class Blockchain {
         return txs;
     }
 
-    // ------------------BLOCKCHAIN------------------
+    // BLOCKCHAIN
     public static LinkedList<Block> getChain(){ return blockchain.chain; }
     public static void updateChain(){
         blockchain.chain = readChain();
-        verifyChain(blockchain.chain);
-        packTransaction();
+        if(verifyChain(blockchain.chain)) packTransaction();
     }
     public static void replaceChain(LinkedList<Block> newChain){
         blockchain.chain = readChain();
@@ -99,7 +97,7 @@ public class Blockchain {
             writeChain(blockchain.chain);
             removeVerifiedTransaction();
         }
-        verifyChain(blockchain.chain);
+        updateChain();
     }
     public static void removeVerifiedTransaction(){
         LinkedList<Block> bc = blockchain.chain;
@@ -112,14 +110,14 @@ public class Blockchain {
                     Transaction upTx = unverifiedTransactions.get(index);
                     if(upTx!=null){
                         if(tx.getClassType().equals("Payment")){
-                            blockchain.notificationController.createNotify(((Payment)tx).getPayerAddress(), ((Payment)tx).getHash(), ((Payment)tx).getOrderId(), "Payment Paid", "Payment Paid", ((Payment)tx).getDetail());
-                            blockchain.notificationController.createNotify(((Payment)tx).getReceiverAddress(), ((Payment)tx).getHash(), ((Payment)tx).getOrderId(), "Payment Received", "Payment Received", ((Payment)tx).getDetail());
+                            blockchain.notificationController.createNotify(((Payment)tx).getPayerAddress(), tx.getHash(), ((Payment)tx).getOrderId(), "Payment Paid", "Payment Paid", tx.getDetail());
+                            blockchain.notificationController.createNotify(((Payment)tx).getReceiverAddress(), tx.getHash(), ((Payment)tx).getOrderId(), "Payment Received", "Payment Received", tx.getDetail());
                         }
                         else if(tx.getClassType().equals("Deposit")){
-                            blockchain.notificationController.createNotify(((Deposit)tx).getReceiverAddress(), ((Deposit)tx).getHash(), 0, "Deposit", "Deposit Coin", ((Deposit)tx).getDetail());
+                            blockchain.notificationController.createNotify(((Deposit)tx).getReceiverAddress(), tx.getHash(), 0, "Deposit", "Deposit Coin", tx.getDetail());
                         }
                         else if(tx.getClassType().equals("Withdraw")){
-                            blockchain.notificationController.createNotify(((Withdraw)tx).getPayerAddress(), ((Withdraw)tx).getHash(), 0, "Withdraw", "Withdraw Money", ((Withdraw)tx).getDetail());
+                            blockchain.notificationController.createNotify(((Withdraw)tx).getPayerAddress(), tx.getHash(), 0, "Withdraw", "Withdraw Money", tx.getDetail());
                         }
                     }
                     removeUnverifiedTransaction(tx);
@@ -151,6 +149,7 @@ public class Blockchain {
             File file = new File(path, "blockchain.json");
             if (!file.exists()) file.createNewFile();
             FileWriter fw = new FileWriter(file.getAbsoluteFile());
+
             BufferedWriter bw = new BufferedWriter(fw);
             bw.write(gson.toJson(bc));
             bw.close();
@@ -159,7 +158,7 @@ public class Blockchain {
 		}
     }
 
-    // ------------------UNVERIFIED TRANSACTIONS------------------
+    // UNVERIFIED TRANSACTIONS
     public static void addUnveriedTransaction(Transaction newTransacion) {
         LinkedList<Transaction> unverifiedTransactions = readUnverifiedTransactions();
         unverifiedTransactions.add(newTransacion);
@@ -195,6 +194,7 @@ public class Blockchain {
             File file = new File(path, "unverifiedTransactions.json");
             if (!file.exists()) file.createNewFile();
             FileWriter fw = new FileWriter(file.getAbsoluteFile());
+
             BufferedWriter bw = new BufferedWriter(fw);
             bw.write(gson.toJson(ut));
             bw.close();
@@ -203,7 +203,7 @@ public class Blockchain {
 		}
     }
 
-    // ------------------PACK TRANSACTIONS------------------
+    // PACK TRANSACTIONS
     public static String lastBlockHash(){ return blockchain.chain.size()>0? blockchain.chain.getLast().getHash(): "0"; }
     public static void packTransaction() {
         LinkedList<Transaction> unverifiedTransactions = readUnverifiedTransactions();

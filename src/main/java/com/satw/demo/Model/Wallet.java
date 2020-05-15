@@ -6,7 +6,6 @@ import static com.satw.demo.Util.KeyPairUtil.publicKeyToAddress;
 
 import java.security.Key;
 import java.security.PublicKey;
-import java.util.Collections;
 import java.util.LinkedList;
 import java.util.Map;
 
@@ -21,7 +20,6 @@ import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 import com.google.gson.annotations.Expose;
-import com.satw.demo.Blockchain.Block;
 import com.satw.demo.Blockchain.Blockchain;
 import com.satw.demo.Blockchain.Deposit;
 import com.satw.demo.Blockchain.Payment;
