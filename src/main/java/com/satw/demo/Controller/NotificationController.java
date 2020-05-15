@@ -32,8 +32,7 @@ public class NotificationController {
     DataSource dataSource;
 
     public void createNotify(String userWalletAddress, String txHash, int orderId, String type, String title, String description){
-        Notification notify;
-        notify = new Notification(userWalletAddress, txHash, orderId, type, title, description);
+        Notification notify = new Notification(userWalletAddress, txHash, orderId, type, title, description);
         notificationRepository.save(notify);
         //Mediator
         if(orderId>0 && type.equals("Payment Paid")) orderController.requestUpdateOrderState(orderId);
