@@ -19,15 +19,15 @@ public class Payment extends Transaction {
 
     //交易處理
     private void payment(){
-        LinkedList<TransactionOutput> outputs = super.getOutputs();
-        //建立交易輸出金流
+        Blockchain blockchain = Blockchain.getInstance();
+        
+        LinkedList<TransactionOutput> outputs = super.getOutputs();                                         //建立交易輸出金流
+        outputs.add(new TransactionOutput(receiverAddress, super.getAmount(), super.getHash()));            //將新的UTXO放到鏈的UTXO清單中
         int restAmount = getInputsAmount() - super.getAmount();
-        outputs.add(new TransactionOutput(receiverAddress, super.getAmount(), super.getHash()));
         if(restAmount>0) outputs.add(new TransactionOutput(payerAddress, restAmount, super.getHash()));
-        //將新的UTXO放到鏈的UTXO清單中
-        for(TransactionOutput output: super.getOutputs()) Blockchain.putUTXOs(output.getHash(), output);
-        //從鏈的UTXO清單將已使用掉的UTXO移出
-        for(TransactionInput input: super.getInputs()) Blockchain.removeUTXOs(input.getSourceOutputHash());
+
+        for(TransactionOutput output: super.getOutputs()) blockchain.putUTXOs(output.getHash(), output);    //將新的UTXO放到鏈的UTXO清單中
+        for(TransactionInput input: super.getInputs()) blockchain.removeUTXOs(input.getSourceOutputHash()); //從鏈的UTXO清單將已使用掉的UTXO移出
     }
 
     //-------------------- concrete method --------------------

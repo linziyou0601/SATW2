@@ -13,6 +13,7 @@ import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 import com.google.gson.annotations.Expose;
 import com.satw.demo.Blockchain.Blockchain;
@@ -47,6 +48,10 @@ public class User{
     private Set<Product> products;
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, mappedBy = "buyer")
     private Set<Order> orders;
+
+    //ACCESS POINT OF SINGLETON BLOCKCHAIN INSTANCE
+    @Transient
+    Blockchain blockchain = Blockchain.getInstance();
 
     //------------------------------------Method------------------------------------
     //Constructor
@@ -93,8 +98,8 @@ public class User{
     public String getWalletPublicKey(){ return wallet.getPublicKey(); }
     public String getWalletPrivateKey(){ return wallet.getPrivateKey(); }
     public String getWalletAddress(){ return wallet.getAddress(); }
-    public int getWalletBalance(){ return Blockchain.getBalance(wallet.getAddress()); }
-    public LinkedList<Transaction> getWalletTransactions(){ return Blockchain.getTransactions(wallet.getAddress()); }
+    public int getWalletBalance(){ return blockchain .getBalance(wallet.getAddress()); }
+    public LinkedList<Transaction> getWalletTransactions(){ return blockchain.getTransactions(wallet.getAddress()); }
     //-
     public Transaction makeDeposit(int amount){ return wallet.deposit(amount); }
     public Transaction makeWithdraw(int amount){ return wallet.withdraw(amount); }

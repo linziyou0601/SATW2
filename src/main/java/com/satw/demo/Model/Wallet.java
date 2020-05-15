@@ -18,6 +18,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 import com.google.gson.annotations.Expose;
 import com.satw.demo.Blockchain.Blockchain;
@@ -53,6 +54,10 @@ public class Wallet{
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
+    //ACCESS POINT OF SINGLETON BLOCKCHAIN INSTANCE
+    @Transient
+    Blockchain blockchain = Blockchain.getInstance();
+
     //------------------------------------Method------------------------------------
     //Constructor
     public Wallet(){
@@ -79,9 +84,9 @@ public class Wallet{
     }
     public Transaction withdraw(int amount){
         //驗證餘額是否足夠本次交易
-        int balance = Blockchain.getBalance(address);
+        int balance = blockchain.getBalance(address);
         if(balance >= amount){
-            LinkedList<TransactionInput> inputs = Blockchain.getTxInputs(address, amount);
+            LinkedList<TransactionInput> inputs = blockchain.getTxInputs(address, amount);
             Transaction transaction = new Withdraw(publicKey, address, amount, inputs);
             transaction.generateSignature(privateKey);
             return transaction;
@@ -89,13 +94,13 @@ public class Wallet{
         return null;
     }
     public Transaction payment(Order order){
-        String receiverAddress = order.getState() instanceof Ordered? Blockchain.getThirdPartyWalletAddress(): order.getProductSellerWalletAddress();
+        String receiverAddress = order.getState() instanceof Ordered? blockchain.getThirdPartyWalletAddress(): order.getProductSellerWalletAddress();
         int amount = order.getState() instanceof Ordered? order.getPayableAmount(): order.getAmount();
 
         //驗證餘額是否足夠本次交易
-        int balance = Blockchain.getBalance(address);
+        int balance = blockchain.getBalance(address);
         if(balance >= amount){
-            LinkedList<TransactionInput> inputs = Blockchain.getTxInputs(address, amount);
+            LinkedList<TransactionInput> inputs = blockchain.getTxInputs(address, amount);
             String detail = order.getDetail();
             Transaction transaction = new Payment(publicKey, address, receiverAddress, order.getId(), detail, amount, inputs);
             transaction.generateSignature(privateKey);

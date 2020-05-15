@@ -33,6 +33,7 @@ public class OtpController {
     @ResponseBody
     public Msg requestVerifyOtp(@RequestParam("otpCode") String otpCode, HttpSession session) {
         Msg msg = new Msg();
+        Blockchain blockchain = Blockchain.getInstance();
         User user = (User) session.getAttribute("user");
         Otp otp = (Otp) session.getAttribute("otp");
         if(user==null){
@@ -45,7 +46,7 @@ public class OtpController {
                 switch(state){
                     case CORRECT:
                         Transaction tx = (Transaction) session.getAttribute("newTx");
-                        Blockchain.addUnveriedTransaction(tx);
+                        blockchain.addUnveriedTransaction(tx);
                         msg = new Msg("Successful", "Your transaction "+tx.getDetail()+" has sent to blockchain.", "success");
                         session.removeAttribute("newTx");
                         session.removeAttribute("otp");

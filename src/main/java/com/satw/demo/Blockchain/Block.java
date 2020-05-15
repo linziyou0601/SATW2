@@ -36,6 +36,7 @@ public class Block {
     // operator
     //加入交易至該區塊
     public void addTransaction(Transaction transaction) {
+        Blockchain blockchain = Blockchain.getInstance();
         //加入前先驗證交易資料 處理交易金流至Global UTXO
         if(transaction != null) {
             if(transaction.processTransaction()) {
@@ -43,7 +44,7 @@ public class Block {
                 transactions.add(transaction);      //放入區塊
             } else {
                 System.out.println("[v] 交易不合理，移除"); //prompt
-                Blockchain.removeUnverifiedTransaction(transaction);
+                blockchain.removeUnverifiedTransaction(transaction);
             }
         }
     }

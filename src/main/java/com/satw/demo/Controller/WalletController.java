@@ -107,6 +107,7 @@ public class WalletController {
     @ResponseBody
     public Msg requestDeposit(@RequestParam("amount") String amountStr, HttpSession session) {
         Msg msg;
+        Blockchain blockchain = Blockchain.getInstance();
         User user = (User) session.getAttribute("user");
         if(user==null){
             msg = new Msg("Error", "Invalid operation!", "error");
@@ -116,7 +117,7 @@ public class WalletController {
                 if(amount>0){
                     Transaction tx = user.makeDeposit(amount);
                     if(tx!=null){
-                        Blockchain.addUnveriedTransaction(tx);
+                        blockchain.addUnveriedTransaction(tx);
                         msg = new Msg("Successful", "Your transaction "+tx.getDetail()+" has sent to blockchain", "success");
                     } else {
                         msg = new Msg("Failed", "It has some trubles.", "error");

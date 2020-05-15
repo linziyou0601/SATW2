@@ -14,7 +14,8 @@ public class TransactionInput {
 
     // operator
     public void processAmount() {
-        TransactionOutput UTXO = Blockchain.getUTXOs().get(sourceOutputHash);
+        Blockchain blockchain = Blockchain.getInstance();
+        TransactionOutput UTXO = blockchain.getUTXOs().get(sourceOutputHash);
         payerAddress = (UTXO==null? "": UTXO.getReceiverAddress());
         amount = (UTXO==null? 0: UTXO.getAmount());
     }

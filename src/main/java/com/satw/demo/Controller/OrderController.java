@@ -107,22 +107,23 @@ public class OrderController {
     @ResponseBody
     public Msg requestReceiveOrder(@RequestParam("id") int id, HttpSession session) {
         Msg msg = new Msg();
+        Blockchain blockchain = Blockchain.getInstance();
         User user = (User) session.getAttribute("user");
         Order order = orderRepository.findFirstById(id);
         if(user==null){
             msg = new Msg("Error", "Invalid operation!", "error");
         } else {
             if(order!=null && order.getBuyerId() == user.getId() && order.getState() instanceof Shipped){
-                User thirdParty = Blockchain.getThirdParty();
+                User thirdParty = blockchain.getThirdParty();
                 //第三方補差額
                 while(thirdParty.getWalletBalance()<order.getAmount()){
                     Transaction tx = thirdParty.makeDeposit(order.getAmount() - thirdParty.getWalletBalance());
-                    Blockchain.addUnveriedTransaction(tx);
+                    blockchain.addUnveriedTransaction(tx);
                 }
                 //第三方轉移Coins
                 Transaction tx = thirdParty.makePayment(order);
-                Blockchain.addUnveriedTransaction(tx);
-                Blockchain.updateChain();
+                blockchain.addUnveriedTransaction(tx);
+                blockchain.updateChain();
                 msg = new Msg("Successful", "Order state has updated.", "success");
             } else {
                 msg = new Msg("Error", "Invalid operation.", "error");

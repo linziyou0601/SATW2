@@ -20,22 +20,26 @@ import com.satw.demo.Dao.UserRepository;
 import com.satw.demo.Model.User;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
-@Component
+@Service
 public class Blockchain {
 
     @Autowired
     UserRepository userRepository;
 
     @Autowired
-    NotificationController notificationController;
+    NotificationController notificationController ;
 
-    public static Blockchain blockchain;
     @PostConstruct
-    public void init() {    
-        blockchain = this;
+    private void init(){
+        INSTANCE = this; //Wiring Spring Boot Bean
     }
+
+    // SINGLETON PATTERN
+    private static Blockchain INSTANCE = new Blockchain();
+    private Blockchain(){};
+    public static Blockchain getInstance(){ return INSTANCE; }
 
     //------------------------------------Attributes------------------------------------
     public final int DIFFICULTY = 3;
@@ -44,28 +48,28 @@ public class Blockchain {
 
     //------------------------------------Methods------------------------------------
     // Third Party
-    public static User getThirdParty(){ return blockchain.userRepository.findFirstById(1); }
-    public static String getThirdPartyWalletAddress(){ return getThirdParty().getWalletAddress(); }
+    public User getThirdParty(){ return userRepository.findFirstById(1); }
+    public String getThirdPartyWalletAddress(){ return getThirdParty().getWalletAddress(); }
 
     // UTXOs
-    public static HashMap<String, TransactionOutput> getUTXOs(){ return blockchain.UTXOs; }
-    public static void putUTXOs(String key, TransactionOutput transactionOutput){ blockchain.UTXOs.put(key, transactionOutput); }
-    public static void removeUTXOs(String key){ blockchain.UTXOs.remove(key); }
+    public HashMap<String, TransactionOutput> getUTXOs(){ return UTXOs; }
+    public void putUTXOs(String key, TransactionOutput transactionOutput){ UTXOs.put(key, transactionOutput); }
+    public void removeUTXOs(String key){ UTXOs.remove(key); }
     
     // GET INFOMATION BY WALLET ADDRESS
-    public static int getBalance(String address){
+    public int getBalance(String address){
         updateChain();
         int total = 0;
-        for(TransactionOutput UTXO: blockchain.UTXOs.values())
+        for(TransactionOutput UTXO: UTXOs.values())
             if(UTXO.verifyOwner(address))
                 total += UTXO.getAmount();
         return total;
     }
-    public static LinkedList<TransactionInput> getTxInputs(String address, int amount){
+    public LinkedList<TransactionInput> getTxInputs(String address, int amount){
         LinkedList<TransactionInput> inputs = new LinkedList<>();
         int ownUTXOs = 0;
         //取得部分UTXO直到足夠支付本次交易的輸出
-        for(TransactionOutput UTXO: blockchain.UTXOs.values()){
+        for(TransactionOutput UTXO: UTXOs.values()){
             if(UTXO.verifyOwner(address)){
                 inputs.add(new TransactionInput(UTXO.getHash()));
                 ownUTXOs += UTXO.getAmount();
@@ -74,9 +78,9 @@ public class Blockchain {
         }
         return inputs;
     }
-    public static LinkedList<Transaction> getTransactions(String address){
+    public LinkedList<Transaction> getTransactions(String address){
         LinkedList<Transaction> txs = new LinkedList<>();
-        for(Block block: blockchain.chain)
+        for(Block block: chain)
             for(Transaction tx: block.getTransactions())
                 if(tx.verifyOwner(address))
                     txs.add(tx);
@@ -85,22 +89,22 @@ public class Blockchain {
     }
 
     // BLOCKCHAIN
-    public static LinkedList<Block> getChain(){ return blockchain.chain; }
-    public static void updateChain(){
-        blockchain.chain = readChain();
-        if(verifyChain(blockchain.chain)) packTransaction();
+    public LinkedList<Block> getChain(){ return chain; }
+    public void updateChain(){
+        chain = readChain();
+        if(verifyChain(chain)) packTransaction();
     }
-    public static void replaceChain(LinkedList<Block> newChain){
-        blockchain.chain = readChain();
-        if(verifyChain(newChain) && newChain.size() > blockchain.chain.size()){
-            blockchain.chain = newChain;
-            writeChain(blockchain.chain);
+    public void replaceChain(LinkedList<Block> newChain){
+        chain = readChain();
+        if(verifyChain(newChain) && newChain.size() > chain.size()){
+            chain = newChain;
+            writeChain(chain);
             removeVerifiedTransaction();
         }
         updateChain();
     }
-    public static void removeVerifiedTransaction(){
-        LinkedList<Block> bc = blockchain.chain;
+    public void removeVerifiedTransaction(){
+        LinkedList<Block> bc = chain;
         Collections.reverse(bc);
         for(Block block: bc){
             for(Transaction tx: block.getTransactions()){
@@ -110,14 +114,14 @@ public class Blockchain {
                     Transaction upTx = unverifiedTransactions.get(index);
                     if(upTx!=null){
                         if(tx.getClassType().equals("Payment")){
-                            blockchain.notificationController.createNotify(((Payment)tx).getPayerAddress(), tx.getHash(), ((Payment)tx).getOrderId(), "Payment Paid", "Payment Paid", tx.getDetail());
-                            blockchain.notificationController.createNotify(((Payment)tx).getReceiverAddress(), tx.getHash(), ((Payment)tx).getOrderId(), "Payment Received", "Payment Received", tx.getDetail());
+                            notificationController.createNotify(((Payment)tx).getPayerAddress(), tx.getHash(), ((Payment)tx).getOrderId(), "Payment Paid", "Payment Paid", tx.getDetail());
+                            notificationController.createNotify(((Payment)tx).getReceiverAddress(), tx.getHash(), ((Payment)tx).getOrderId(), "Payment Received", "Payment Received", tx.getDetail());
                         }
                         else if(tx.getClassType().equals("Deposit")){
-                            blockchain.notificationController.createNotify(((Deposit)tx).getReceiverAddress(), tx.getHash(), 0, "Deposit", "Deposit Coin", tx.getDetail());
+                            notificationController.createNotify(((Deposit)tx).getReceiverAddress(), tx.getHash(), 0, "Deposit", "Deposit Coin", tx.getDetail());
                         }
                         else if(tx.getClassType().equals("Withdraw")){
-                            blockchain.notificationController.createNotify(((Withdraw)tx).getPayerAddress(), tx.getHash(), 0, "Withdraw", "Withdraw Money", tx.getDetail());
+                            notificationController.createNotify(((Withdraw)tx).getPayerAddress(), tx.getHash(), 0, "Withdraw", "Withdraw Money", tx.getDetail());
                         }
                     }
                     removeUnverifiedTransaction(tx);
@@ -125,7 +129,7 @@ public class Blockchain {
             }
         } 
     }
-    public static LinkedList<Block> readChain(){
+    public LinkedList<Block> readChain(){
         LinkedList<Block> bc = new LinkedList<>();
         try {
             String path = System.getProperty("user.home") + File.separator + "Blockchain";
@@ -142,7 +146,7 @@ public class Blockchain {
         if(bc==null) bc = new LinkedList<>();
         return bc;
     }
-    public static void writeChain(LinkedList<Block> bc){
+    public void writeChain(LinkedList<Block> bc){
         Gson gson = new Gson();
         try {
             String path = System.getProperty("user.home") + File.separator + "Blockchain";
@@ -159,18 +163,18 @@ public class Blockchain {
     }
 
     // UNVERIFIED TRANSACTIONS
-    public static void addUnveriedTransaction(Transaction newTransacion) {
+    public void addUnveriedTransaction(Transaction newTransacion) {
         LinkedList<Transaction> unverifiedTransactions = readUnverifiedTransactions();
         unverifiedTransactions.add(newTransacion);
         writeUnverifiedTransactions(unverifiedTransactions);
     }
-    public static void removeUnverifiedTransaction(Transaction transaction){
+    public void removeUnverifiedTransaction(Transaction transaction){
         LinkedList<Transaction> unverifiedTransactions = readUnverifiedTransactions();
         int index = unverifiedTransactions.indexOf(transaction);
         unverifiedTransactions.remove(index);
         writeUnverifiedTransactions(unverifiedTransactions);
     }
-    public static LinkedList<Transaction> readUnverifiedTransactions(){
+    public LinkedList<Transaction> readUnverifiedTransactions(){
         LinkedList<Transaction> ut = new LinkedList<>();
         try {
             String path = System.getProperty("user.home") + File.separator + "Blockchain";
@@ -187,7 +191,7 @@ public class Blockchain {
         if(ut==null) ut = new LinkedList<>();
         return ut;
     }
-    public static void writeUnverifiedTransactions(LinkedList<Transaction> ut){
+    public void writeUnverifiedTransactions(LinkedList<Transaction> ut){
         Gson gson = new Gson();
         try {
             String path = System.getProperty("user.home") + File.separator + "Blockchain";
@@ -204,8 +208,8 @@ public class Blockchain {
     }
 
     // PACK TRANSACTIONS
-    public static String lastBlockHash(){ return blockchain.chain.size()>0? blockchain.chain.getLast().getHash(): "0"; }
-    public static void packTransaction() {
+    public String lastBlockHash(){ return chain.size()>0? chain.getLast().getHash(): "0"; }
+    public void packTransaction() {
         LinkedList<Transaction> unverifiedTransactions = readUnverifiedTransactions();
         while(unverifiedTransactions!=null && unverifiedTransactions.size() > 0){
             Block newBlock = new Block(lastBlockHash());
@@ -214,19 +218,19 @@ public class Blockchain {
                 addBlock(newBlock);
         }
     }
-    public static void addBlock(Block newBlock) {
-        newBlock.mineBlock(blockchain.DIFFICULTY);
-        LinkedList<Block> newChain = blockchain.chain;
+    public void addBlock(Block newBlock) {
+        newBlock.mineBlock(DIFFICULTY);
+        LinkedList<Block> newChain = chain;
         newChain.add(newBlock);
         replaceChain(newChain);
     }
 
 
     // ------------------VERIFY------------------
-    public static boolean verifyChain(LinkedList<Block> chain) {
+    public boolean verifyChain(LinkedList<Block> chain) {
         if(chain!=null) chain.sort(Comparator.comparingLong(Block::getTimestamp));
         Block currentBlock, previousBlock;
-        String hashTarget = String.join("", Collections.nCopies(blockchain.DIFFICULTY, "0"));
+        String hashTarget = String.join("", Collections.nCopies(DIFFICULTY, "0"));
         HashMap<String, TransactionOutput> tempUTXOs = new HashMap<>();
         int sequence = 0;
 
@@ -244,7 +248,7 @@ public class Blockchain {
                 System.out.println("[x] 區塊(" + currentBlock.getHash() + ") 的PreviousHash值有誤！");  //prompt
                 return false;
             }
-            if(!currentBlock.getHash().substring(0, blockchain.DIFFICULTY).equals(hashTarget)){
+            if(!currentBlock.getHash().substring(0, DIFFICULTY).equals(hashTarget)){
                 System.out.println("[x] 區塊(" + currentBlock.getHash() + ") 的Hash前綴0數目有誤！");  //prompt
                 return false;
             }
@@ -291,7 +295,7 @@ public class Blockchain {
             }
         }
         System.out.println("[v] 區塊鏈驗證成功！"); //prompt
-        blockchain.UTXOs = tempUTXOs;
+        UTXOs = tempUTXOs;
         Transaction.nonce = sequence;
         return true;
     }

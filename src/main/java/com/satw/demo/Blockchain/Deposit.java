@@ -13,11 +13,11 @@ public class Deposit extends Transaction {
 
     //交易處理
     private void deposit(){
-        LinkedList<TransactionOutput> outputs = super.getOutputs();
-        //建立交易輸出金流
-        outputs.add(new TransactionOutput(receiverAddress, super.getAmount(), super.getHash()));
-        //將新的UTXO放到鏈的UTXO清單中
-        for(TransactionOutput output: super.getOutputs()) Blockchain.putUTXOs(output.getHash(), output);
+        Blockchain blockchain = Blockchain.getInstance();
+        
+        LinkedList<TransactionOutput> outputs = super.getOutputs();                              //建立交易輸出金流
+        outputs.add(new TransactionOutput(receiverAddress, super.getAmount(), super.getHash())); //將新的UTXO放到鏈的UTXO清單中
+        for(TransactionOutput output: super.getOutputs()) blockchain.putUTXOs(output.getHash(), output);
     }
 
     //-------------------- concrete method --------------------

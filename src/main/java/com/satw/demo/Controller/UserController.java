@@ -95,11 +95,12 @@ public class UserController {
         if(redirect.equals("")) redirect = "/";
         if(session.getAttribute("user")!=null) return "redirect:"+redirect;
         Msg msg = new Msg();
+        Blockchain blockchain = Blockchain.getInstance();
         User user = userRepository.findFirstByAccount(account);
         if(user!=null){
             if(user.verifyPassword(password)){
                 session.setAttribute("user", user);
-                Blockchain.updateChain();
+                blockchain.updateChain();
             } else {
                 msg = new Msg("Failed", "Incorrect Password!", "error");
             }
