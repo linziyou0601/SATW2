@@ -54,9 +54,9 @@ public class ProductController {
     //-------------------產品資訊-------------------//
     @GetMapping("products/{id}")
     public String productDetail(@PathVariable int id, Model model){
-        List<Product> products = productRepository.findById(id);
-        if(products.size()>0){
-            model.addAttribute("product", products.get(0));
+        Product product = productRepository.findFirstByIdAndDeleted(id, false);
+        if(product!=null){
+            model.addAttribute("product", product);
             return "productDetail";
         } else {
             return "redirect:/products";
@@ -71,7 +71,7 @@ public class ProductController {
                             @RequestParam("couponCode") String couponCode, 
                             HttpSession session) {
         User user = (User) session.getAttribute("user");
-        List<Product> products = productRepository.findById(id);
+        Product product = productRepository.findFirstByIdAndDeleted(id, false);
         if(user==null){
             return new Msg("Error", "Invalid operation!", "error");
         } else {
@@ -88,8 +88,7 @@ public class ProductController {
                     return new Msg("Failed", "Invalid Coupon code!", "warning");
                 }
             }
-            if(products.size()>0){
-                Product product = products.get(0);
+            if(product!=null){
                 if(product.getStockQty()>0){
                     if(quantity>0){
                         Order order = product.order(user, quantity, coupon);    //建立訂單

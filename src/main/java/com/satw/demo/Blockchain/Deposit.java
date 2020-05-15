@@ -20,6 +20,7 @@ public class Deposit extends Transaction {
         for(TransactionOutput output: super.getOutputs()) Blockchain.putUTXOs(output.getHash(), output);
     }
 
+    //-------------------- concrete method --------------------
     public boolean processTransaction() {
         //驗證交易簽名
         if(super.getSignature()!=null && verifiySignature() == false) {
@@ -41,5 +42,9 @@ public class Deposit extends Transaction {
                 Integer.toString(super.getAmount()) +
                 Integer.toString(super.getSequence())
         );
+    }
+
+    public boolean verifyOwner(String address){
+        return this.receiverAddress.equals(address);
     }
 }

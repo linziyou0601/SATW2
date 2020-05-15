@@ -16,7 +16,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import com.satw.demo.Controller.NotificationController;
-import com.satw.demo.Controller.UserController;
+import com.satw.demo.Dao.UserRepository;
 import com.satw.demo.Model.User;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,14 +26,10 @@ import org.springframework.stereotype.Component;
 public class Blockchain {
 
     @Autowired
-    UserController userController;
+    UserRepository userRepository;
 
     @Autowired
     NotificationController notificationController;
-
-    public int DIFFICULTY = 3;
-    private LinkedList<Block> chain = new LinkedList<>();
-    private HashMap<String, TransactionOutput> UTXOs = new HashMap<>();
 
     public static Blockchain blockchain;
     @PostConstruct
@@ -41,60 +37,46 @@ public class Blockchain {
         blockchain = this;
     }
 
-    // TIRDPARTY
-    public static User getThirdParty(){ return blockchain.userController.getThirdParty(); }
-    public static String getThirdPartyWalletAddress(){ return blockchain.userController.getThirdParty().getWalletAddress(); }
+    //------------------------------------Attributes------------------------------------
+    public int DIFFICULTY = 3;
+    private LinkedList<Block> chain = new LinkedList<>();
+    private HashMap<String, TransactionOutput> UTXOs = new HashMap<>();
 
-    // UTXOs
+    //------------------------------------Methods------------------------------------
+    // ------------------TIRDPARTY------------------
+    public static User getThirdParty(){ return blockchain.userRepository.findFirstById(1); }
+    public static String getThirdPartyWalletAddress(){ return getThirdParty().getWalletAddress(); }
+
+    // ------------------UTXOs------------------
     public static HashMap<String, TransactionOutput> getUTXOs(){ return blockchain.UTXOs; }
     public static void putUTXOs(String key, TransactionOutput transactionOutput){ blockchain.UTXOs.put(key, transactionOutput); }
     public static void removeUTXOs(String key){ blockchain.UTXOs.remove(key); }
-
-    // UNVERIFIED TRANSACTIONS
-    public static void addUnveriedTransaction(Transaction newTransacion) {
-        LinkedList<Transaction> unverifiedTransactions = readUnverifiedTransactions();
-        unverifiedTransactions.add(newTransacion);
-        writeUnverifiedTransactions(unverifiedTransactions);
+    
+    // ------------------BALANCE------------------
+    public static int getBalance(String address){
+        updateChain();
+        int total = 0;
+        for(TransactionOutput UTXO: blockchain.UTXOs.values())
+            if(UTXO.verifyOwner(address))
+                total += UTXO.getAmount();
+        return total;
     }
-    public static void removeUnverifiedTransaction(Transaction transaction){
-        LinkedList<Transaction> unverifiedTransactions = readUnverifiedTransactions();
-        int index = unverifiedTransactions.indexOf(transaction);
-        unverifiedTransactions.remove(index);
-        writeUnverifiedTransactions(unverifiedTransactions);
-    }
-    public static LinkedList<Transaction> readUnverifiedTransactions(){
-        LinkedList<Transaction> ut = new LinkedList<>();
-        try {
-            String path = System.getProperty("user.home") + File.separator + "Blockchain";
-            File file = new File(path, "unverifiedTransactions.json");
-            if (!file.exists()) file.createNewFile();
-            FileReader fileReader = new FileReader(file.getAbsolutePath());
-            
-            Gson gson = new GsonBuilder().registerTypeAdapter(Transaction.class, new TransactionJsonDeserializer()).create();
-            ut = gson.fromJson(fileReader, new TypeToken<LinkedList<Transaction>>(){}.getType());
-            if(ut!=null) ut.sort(Comparator.comparingLong(Transaction::getTimestamp));
-        } catch (Exception e) {
-            e.printStackTrace();
+    public static LinkedList<TransactionInput> getTxInputs(String address, int amount){
+        LinkedList<TransactionInput> inputs = new LinkedList<>();
+        int ownUTXOs = 0;
+        //驗證餘額是否足夠本次交易，並更新UTXO
+        //取得部分UTXO直到足夠支付本次交易的輸出
+        for(TransactionOutput UTXO: blockchain.UTXOs.values()){
+            if(UTXO.verifyOwner(address)){
+                inputs.add(new TransactionInput(UTXO.getHash()));
+                ownUTXOs += UTXO.getAmount();
+            }
+            if(ownUTXOs >= amount) break;
         }
-        if(ut==null) ut = new LinkedList<>();
-        return ut;
-    }
-    public static void writeUnverifiedTransactions(LinkedList<Transaction> ut){
-        Gson gson = new Gson();
-        try {
-            String path = System.getProperty("user.home") + File.separator + "Blockchain";
-            File file = new File(path, "unverifiedTransactions.json");
-            if (!file.exists()) file.createNewFile();
-            FileWriter fw = new FileWriter(file.getAbsoluteFile());
-            BufferedWriter bw = new BufferedWriter(fw);
-            bw.write(gson.toJson(ut));
-            bw.close();
-        } catch (IOException e) {
-			e.printStackTrace();
-		}
+        return inputs;
     }
 
-    // BLOCKCHAIN
+    // ------------------BLOCKCHAIN------------------
     public static LinkedList<Block> getChain(){ return blockchain.chain; }
     public static void updateChain(){
         blockchain.chain = readChain();
@@ -168,7 +150,51 @@ public class Blockchain {
 		}
     }
 
-    // PACK TRANSACTIONS
+    // ------------------UNVERIFIED TRANSACTIONS------------------
+    public static void addUnveriedTransaction(Transaction newTransacion) {
+        LinkedList<Transaction> unverifiedTransactions = readUnverifiedTransactions();
+        unverifiedTransactions.add(newTransacion);
+        writeUnverifiedTransactions(unverifiedTransactions);
+    }
+    public static void removeUnverifiedTransaction(Transaction transaction){
+        LinkedList<Transaction> unverifiedTransactions = readUnverifiedTransactions();
+        int index = unverifiedTransactions.indexOf(transaction);
+        unverifiedTransactions.remove(index);
+        writeUnverifiedTransactions(unverifiedTransactions);
+    }
+    public static LinkedList<Transaction> readUnverifiedTransactions(){
+        LinkedList<Transaction> ut = new LinkedList<>();
+        try {
+            String path = System.getProperty("user.home") + File.separator + "Blockchain";
+            File file = new File(path, "unverifiedTransactions.json");
+            if (!file.exists()) file.createNewFile();
+            FileReader fileReader = new FileReader(file.getAbsolutePath());
+            
+            Gson gson = new GsonBuilder().registerTypeAdapter(Transaction.class, new TransactionJsonDeserializer()).create();
+            ut = gson.fromJson(fileReader, new TypeToken<LinkedList<Transaction>>(){}.getType());
+            if(ut!=null) ut.sort(Comparator.comparingLong(Transaction::getTimestamp));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        if(ut==null) ut = new LinkedList<>();
+        return ut;
+    }
+    public static void writeUnverifiedTransactions(LinkedList<Transaction> ut){
+        Gson gson = new Gson();
+        try {
+            String path = System.getProperty("user.home") + File.separator + "Blockchain";
+            File file = new File(path, "unverifiedTransactions.json");
+            if (!file.exists()) file.createNewFile();
+            FileWriter fw = new FileWriter(file.getAbsoluteFile());
+            BufferedWriter bw = new BufferedWriter(fw);
+            bw.write(gson.toJson(ut));
+            bw.close();
+        } catch (IOException e) {
+			e.printStackTrace();
+		}
+    }
+
+    // ------------------PACK TRANSACTIONS------------------
     public static String lastBlockHash(){ return blockchain.chain.size()>0? blockchain.chain.getLast().getHash(): "0"; }
     public static void packTransaction() {
         LinkedList<Transaction> unverifiedTransactions = readUnverifiedTransactions();
@@ -186,7 +212,8 @@ public class Blockchain {
         replaceChain(newChain);
     }
 
-    // VERIFY
+
+    // ------------------VERIFY------------------
     public static boolean verifyChain(LinkedList<Block> chain) {
         if(chain!=null) chain.sort(Comparator.comparingLong(Block::getTimestamp));
         Block currentBlock, previousBlock;

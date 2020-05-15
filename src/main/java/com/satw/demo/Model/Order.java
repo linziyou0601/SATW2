@@ -92,44 +92,24 @@ public class Order {
     }
 
     //Getter Setter
-    public int getId(){
-        return id;
-    }
-    public Product getProduct(){
-        return this.product;
-    }
-    public User getBuyer(){
-        return buyer;
-    }
-    public int getPrice(){
-        return price;
-    }
-    public int getQuantity(){
-        return quantity;
-    }
-    public Coupon getCoupon(){
-        return coupon;
-    }
-    public State getState(){
-        return state;
-    }
+    public int getId(){ return id; }
+    public Product getProduct(){ return this.product; }
+    public User getBuyer(){ return buyer; }
+    public int getPrice(){ return price; }
+    public int getQuantity(){ return quantity; }
+    public Coupon getCoupon(){ return coupon; }
+    public State getState(){ return state; }
     public void setState(State state){
         this.state = state;
         this.stateType = state.getType();
     }
 
     //Timestamp Getter Setter
-    public Date getCreateTime(){
-        return createTime;
-    }
-    public Date getUpdateTime(){
-        return updateTime;
-    }
+    public Date getCreateTime(){ return createTime; }
+    public Date getUpdateTime(){ return updateTime; }
     
     //Other DB's Relationships Setter
-    public String getStateType(){
-        return stateType;
-    }
+    public String getStateType(){ return stateType; }
     public void setStateType(String stateType){
         this.stateType = stateType;
         setStateFromStateType();
@@ -165,50 +145,24 @@ public class Order {
         notificationController.createNotify(buyer.getWalletAddress(), "", id, "Unpaid Order", "Unpaid Order", getDetail());
     }
     public void notifyUnshipOrder(NotificationController notificationController){
-        notificationController.createNotify(product.getSeller().getWalletAddress(), "", id, "Unship Order", "Unship Order", getDetail());
+        notificationController.createNotify(getProductSellerWalletAddress(), "", id, "Unship Order", "Unship Order", getDetail());
     }
-    public void sendOrderDetail(){
-
-    }
+    public void sendOrderDetail(){}
 
     //Mediator
     //product
-    public int getProductId(){
-        return product.getId();
-    }
-    public String getProductTitle(){
-        return product.getTitle();
-    }
-    public String getProductDescription(){
-        return product.getDescription();
-    }
-    public int getProductPrice(){
-        return price;
-    }
-    public String getProductImgs(){
-        return product.getImgs();
-    }
-    public User getProductSeller(){
-        return product.getSeller();
-    }
-    public int getProductSellerId(){
-        return product.getSellerId();
-    }
-    public String getProductSellerWalletAddress(){
-        return product.getSellerWalletAddress();
-    }
+    public int getProductId(){ return product.getId(); }
+    public String getProductTitle(){ return product.getTitle(); }
+    public String getProductDescription(){ return product.getDescription(); }
+    public int getProductPrice(){ return price; }
+    public String getProductImgs(){ return product.getImgs(); }
+    public User getProductSeller(){ return product.getSeller(); }
+    public int getProductSellerId(){ return product.getSellerId(); }
+    public String getProductSellerWalletAddress(){ return product.getSellerWalletAddress(); }
     //buyer
-    public int getBuyerId(){
-        return buyer.getId();
-    }
-    public String getBuyerWalletAddress(){
-        return buyer.getWalletAddress();
-    }
+    public int getBuyerId(){ return buyer.getId(); }
+    public String getBuyerWalletAddress(){ return buyer.getWalletAddress(); }
     //coupon
-    public String getCouponCode(){
-        return coupon==null? "": coupon.getCode();
-    }
-    public int getCouponDiscount(){
-        return coupon==null? 0: coupon.getDiscount();
-    }
+    public String getCouponCode(){ return coupon==null? "": coupon.getCode(); }
+    public int getCouponDiscount(){ return coupon==null? 0: coupon.getDiscount(); }
 }

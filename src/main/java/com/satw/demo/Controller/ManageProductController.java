@@ -47,7 +47,7 @@ public class ManageProductController {
     public String myProducts(Model model, HttpSession session,  RedirectAttributes attr){
         User user = (User) session.getAttribute("user");
         if(user==null) return "redirect:/login?redirect=/myProducts";
-        List<Product> products = productRepository.findBySeller(user);
+        List<Product> products = productRepository.findBySellerAndDeleted(user, false);
         Collections.reverse(products);
         model.addAttribute("products", products);
         return "myProducts";
@@ -115,9 +115,10 @@ public class ManageProductController {
     public String editProduct(@PathVariable int id, Model model, HttpSession session, RedirectAttributes attr){
         User user = (User) session.getAttribute("user");
         if(user==null) return "redirect:/login?redirect=/myProducts/"+id;
-        List<Product> products = productRepository.findById(id);
-        if(products.size()>0 && products.get(0).getSeller().getId() == user.getId()){
-            model.addAttribute("product", products.get(0));
+
+        Product product = productRepository.findFirstByIdAndDeleted(id, false);
+        if(product!=null && product.getSeller().getId() == user.getId()){
+            model.addAttribute("product", product);
             return "editProduct";
         } else {
             Msg msg = new Msg("Error", "Invalid operation!", "error");
@@ -129,25 +130,24 @@ public class ManageProductController {
     @PostMapping("myProducts/requestEditProduct")
     @ResponseBody
     public Msg requestEditProduct(@RequestParam("id") int id,
-                                     @RequestParam("title") String title,
-                                     @RequestParam("description") String description,
-                                     @RequestParam("price") String priceStr,
-                                     @RequestParam("stockQty") String stockQtyStr,
-                                     @RequestParam("files") MultipartFile files,
-                                     HttpSession session)
+                                  @RequestParam("title") String title,
+                                  @RequestParam("description") String description,
+                                  @RequestParam("price") String priceStr,
+                                  @RequestParam("stockQty") String stockQtyStr,
+                                  @RequestParam("files") MultipartFile files,
+                                  HttpSession session)
     {
         User user = (User) session.getAttribute("user");
         Msg msg = new Msg();
-        List<Product> products = productRepository.findById(id);
+        Product product = productRepository.findFirstByIdAndDeleted(id, false);
         if(user==null){
             msg = new Msg("Error", "Invalid operation!", "error");
         } else {
             //驗證是否可編輯
-            if(products.size()>0 && products.get(0).getSeller().getId() == user.getId()){
+            if(product!=null && product.getSeller().getId() == user.getId()){
                 try {
                     int price = Integer.parseInt(priceStr);
                     int stockQty = Integer.parseInt(stockQtyStr);
-                    Product product = products.get(0);
                     //驗證價格及數量是否合理
                     if(price<=0 || stockQty<0){
                         if(price<=0) msg = new Msg("Failed", "Price Must Large Than 0.", "error");
@@ -203,13 +203,12 @@ public class ManageProductController {
     public Msg requestDeleteProduct(@RequestBody Map<String,String> reqMap, HttpSession session) {
         Msg msg = new Msg();
         User user = (User) session.getAttribute("user");
-        List<Product> products = productRepository.findById(Integer.parseInt(reqMap.get("id")));
+        Product product = productRepository.findFirstByIdAndDeleted(Integer.parseInt(reqMap.get("id")), false);
         if(user==null){
             msg = new Msg("Error", "Invalid operation!", "error");
         } else {
             //驗證是否可編輯
-            if(products.size()>0 && products.get(0).getSeller().getId() == user.getId()){
-                Product product = products.get(0);
+            if(product!=null && product.getSeller().getId() == user.getId()){
                 product.setDeleted(true);
                 productRepository.saveAndFlush(product);
                 msg = new Msg("Successful", "Product is deleted", "success");

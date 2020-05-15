@@ -66,6 +66,7 @@ public class ApiController {
         }
         Coupon coupon = new Coupon(code, discount);
         couponRepository.save(coupon);
+
         Map<Object, Object> result = new HashMap<>();
         result.put("code", code);
         result.put("discount", discount);
@@ -76,11 +77,10 @@ public class ApiController {
     @GetMapping("api/getCoupon")
     @ResponseBody
     public Map<Object, Object> getCoupon(@RequestParam("code") String code) {
-        List<Coupon> coupons = couponRepository.findByCode(code);
+        Coupon coupon = couponRepository.findFirstByCode(code);
         Map<Object, Object> result = new HashMap<>();
-        if(coupons.size()>0){
+        if(coupon != null){
             Gson gson = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().create();
-            Coupon coupon = coupons.get(0);
             result.put("status", "successful");
             result.put("coupon", gson.fromJson(gson.toJson(coupon), Object.class));
             result.put("available", coupon.getAvailable());
@@ -96,11 +96,11 @@ public class ApiController {
     @GetMapping("api/getUserId")
     @ResponseBody
     public Map<Object, Object> getUserId(@RequestParam("account") String account) {
-        List<User> users = userRepository.findByAccount(account);
+        User user = userRepository.findFirstByAccount(account);
         Map<Object, Object> result = new HashMap<>();
-        if(users.size()>0){
+        if(user != null){
             result.put("status", "successful");
-            result.put("user_id", users.get(0).getId());
+            result.put("user_id", user.getId());
         } else {
             result.put("status", "failed");
             result.put("user_id", "");
@@ -112,11 +112,11 @@ public class ApiController {
     @GetMapping("api/getBalance")
     @ResponseBody
     public Map<Object, Object> getBalance(@RequestParam("user_id") int user_id) {
-        List<User> users = userRepository.findById(user_id);
+        User user = userRepository.findFirstById(user_id);
         Map<Object, Object> result = new HashMap<>();
-        if(users.size()>0){
+        if(user != null){
             result.put("status", "successful");
-            result.put("balance", users.get(0).getWalletBalance());
+            result.put("balance", user.getWalletBalance());
         } else {
             result.put("status", "failed");
             result.put("balance", "");
@@ -128,11 +128,11 @@ public class ApiController {
     @GetMapping("api/getMyProducts")
     @ResponseBody
     public Map<Object, Object> getMyProducts(@RequestParam("user_id") int user_id) {
-        List<User> users = userRepository.findById(user_id);
+        User user = userRepository.findFirstById(user_id);
         Map<Object, Object> result = new HashMap<>();
-        if(users.size()>0){
+        if(user != null){
             Gson gson = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().create();
-            List<Product> products = productRepository.findBySeller(users.get(0));
+            List<Product> products = productRepository.findBySellerAndDeleted(user, false);
             result.put("status", "successful");
             result.put("my_products", gson.fromJson(gson.toJson(products), Object.class));
         } else {
@@ -146,11 +146,11 @@ public class ApiController {
     @GetMapping("api/getMyOrders")
     @ResponseBody
     public Map<Object, Object> getMyOrders(@RequestParam("user_id") int user_id) {
-        List<User> users = userRepository.findById(user_id);
+        User user = userRepository.findFirstById(user_id);
         Map<Object, Object> result = new HashMap<>();
-        if(users.size()>0){
+        if(user != null){
             Gson gson = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().create();
-            List<Order> orders = orderRepository.findByOwner(users.get(0));
+            List<Order> orders = orderRepository.findByOwner(user);
             result.put("status", "successful");
             result.put("my_orders", gson.fromJson(gson.toJson(orders), Object.class));
         } else {

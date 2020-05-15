@@ -66,69 +66,36 @@ public class Wallet{
     }
 
     //Getter Setter
-    public int getId(){
-        return id;
-    }
-    public String getPublicKey(){
-        return publicKey;
-    }
-    public String getPrivateKey(){
-        return privateKey;
-    }
-    public String getAddress(){
-        return address;
-    }
+    public int getId(){ return id; }
+    public String getPublicKey(){ return publicKey; }
+    public String getPrivateKey(){ return privateKey; }
+    public String getAddress(){ return address; }
     
     //Other DB's Relationships Setter
-    public void setUser(User user){
-        this.user = user;
-    }
+    public void setUser(User user){ this.user = user; }
 
     //Operator
     public int getBalance(){
-        Blockchain.updateChain();
-        int total = 0;
-        for(TransactionOutput UTXO: Blockchain.getUTXOs().values())
-            if(UTXO.verifyOwner(address))
-                total += UTXO.getAmount();
-        return total;
+        return Blockchain.getBalance(address);
     }
     public LinkedList<Transaction> getDetail(){
         LinkedList<Transaction> txs = new LinkedList<>();
         for(Block block: Blockchain.getChain())
-            for(Transaction tx: block.getTransactions()){
-                if((tx.getClassType().equals("Payment") && ((Payment)tx).getPayerAddress().equals(address)) ||
-                   (tx.getClassType().equals("Payment") && ((Payment)tx).getReceiverAddress().equals(address)) ||
-                   (tx.getClassType().equals("Withdraw") && ((Withdraw)tx).getPayerAddress().equals(address)) ||
-                   (tx.getClassType().equals("Deposit") && ((Deposit)tx).getReceiverAddress().equals(address)))
+            for(Transaction tx: block.getTransactions())
+                if(tx.verifyOwner(address))
                     txs.add(tx);
-            }
         Collections.reverse(txs);
         return txs;
     }
     public Transaction deposit(int amount){
-        Blockchain.updateChain();
         Transaction transaction = new Deposit(publicKey, address, amount);
         transaction.generateSignature(privateKey);
         return transaction;
     }
     public Transaction withdraw(int amount){
-        Blockchain.updateChain();
-        LinkedList<TransactionInput> inputs = new LinkedList<>();
-        int ownUTXOs = 0;
-
-        //驗證餘額是否足夠本次交易，並更新UTXO
-        //取得部分UTXO直到足夠支付本次交易的輸出
-        for(TransactionOutput UTXO: Blockchain.getUTXOs().values()){
-            if(UTXO.verifyOwner(address)){
-                inputs.add(new TransactionInput(UTXO.getHash()));
-                ownUTXOs += UTXO.getAmount();
-            }
-            if(ownUTXOs >= amount) break;
-        }
-        
         //驗證餘額是否足夠本次交易
-        if(ownUTXOs >= amount){
+        if(getBalance() >= amount){
+            LinkedList<TransactionInput> inputs = Blockchain.getTxInputs(address, amount);
             Transaction transaction = new Withdraw(publicKey, address, amount, inputs);
             transaction.generateSignature(privateKey);
             return transaction;
@@ -136,27 +103,14 @@ public class Wallet{
         return null;
     }
     public Transaction payment(Order order){
-        Blockchain.updateChain();
-        LinkedList<TransactionInput> inputs = new LinkedList<>();
-        int ownUTXOs = 0;
-        String payerAddress = address;
         String receiverAddress = order.getState() instanceof Ordered? Blockchain.getThirdPartyWalletAddress(): order.getProductSellerWalletAddress();
         int amount = order.getState() instanceof Ordered? order.getPayableAmount(): order.getAmount();
 
-        //驗證餘額是否足夠本次交易，並更新UTXO
-        //取得部分UTXO直到足夠支付本次交易的輸出
-        for(TransactionOutput UTXO: Blockchain.getUTXOs().values()){
-            if(UTXO.verifyOwner(payerAddress)){
-                inputs.add(new TransactionInput(UTXO.getHash()));
-                ownUTXOs += UTXO.getAmount();
-            }
-            if(ownUTXOs >= amount) break;
-        }
-
         //驗證餘額是否足夠本次交易
-        if(ownUTXOs >= amount){
+        if(getBalance() >= amount){
+            LinkedList<TransactionInput> inputs = Blockchain.getTxInputs(address, amount);
             String detail = order.getDetail();
-            Transaction transaction = new Payment(publicKey, payerAddress, receiverAddress, order.getId(), detail, amount, inputs);
+            Transaction transaction = new Payment(publicKey, address, receiverAddress, order.getId(), detail, amount, inputs);
             transaction.generateSignature(privateKey);
             return transaction;
         }

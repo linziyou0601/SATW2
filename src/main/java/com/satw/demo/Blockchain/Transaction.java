@@ -17,7 +17,8 @@ public abstract class Transaction {
     private int sequence;
     private LinkedList<TransactionInput> inputs = new LinkedList<>();
     private LinkedList<TransactionOutput> outputs = new LinkedList<>();
-    //ORM
+
+    //ORM's Representing
     private String classType;
 
     Transaction(String publicKey, String detail, int amount, LinkedList<TransactionInput> inputs, String classType){
@@ -55,43 +56,43 @@ public abstract class Transaction {
             total += output.getAmount();
         return total;
     }
-    public abstract boolean processTransaction();
-    public abstract String hashPlainData();
     public String calculateHash(){
         return StringUtil.SHA256(this.hashPlainData());
     }
+    //---------- abstract method ----------
+    public abstract boolean processTransaction();
+    public abstract String hashPlainData();
+    public abstract boolean verifyOwner(String address);
 
     //-------------------- encrypt and signature --------------------
     //encrypt using private key
     public void generateSignature(String privateKey) {
         String plainData = hashPlainData();
         signature = StringUtil.base64Encode(
-                KeyPairUtil.applyECDSASig(
-                        KeyPairUtil.stringToPrivateKey(privateKey),
-                        plainData
-                )
+            KeyPairUtil.applyECDSASig(
+                KeyPairUtil.stringToPrivateKey(privateKey), 
+                plainData
+            )
         );
     }
     //verify using public key
     public boolean verifiySignature() {
         String plainData = hashPlainData();
         return KeyPairUtil.verifyECDSASig(
-                KeyPairUtil.stringToPublicKey(publicKey),
-                plainData,
-                StringUtil.base64Decode(signature)
+            KeyPairUtil.stringToPublicKey(publicKey),
+            plainData,
+            StringUtil.base64Decode(signature)
         );
     }
 
+    //-------------------- OVERRIDE DEFAULT OBJECT EQUALS METHOD --------------------
     public boolean equals(Object obj) {
-        if (this == obj)
-            return true;
-        if (obj == null)
-            return false;
-        if (getClass() != obj.getClass())
-            return false;
+        if(this == obj) return true;
+        if(obj == null) return false;
+        if(getClass() != obj.getClass()) return false;
+
         Transaction other = (Transaction) obj;
-        if (!this.hash.equals(other.getHash()))
-            return false;
+        if(!this.hash.equals(other.getHash())) return false;
         return true;
     }
 }

@@ -12,6 +12,7 @@ public class Msg {
     public boolean showCloseButton = false;
     public boolean allowEscapeKey = true;
     public boolean allowOutsideClick = true;
+    
     public Msg(){};
     public Msg(String title, String text, String icon){
         this.title = title;

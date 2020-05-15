@@ -30,6 +30,7 @@ public class Payment extends Transaction {
         for(TransactionInput input: super.getInputs()) Blockchain.removeUTXOs(input.getSourceOutputHash());
     }
 
+    //-------------------- concrete method --------------------
     public boolean processTransaction() {
         //讀入輸入源
         for(TransactionInput input: super.getInputs()) input.processAmount();
@@ -59,5 +60,9 @@ public class Payment extends Transaction {
                 Integer.toString(super.getAmount()) +
                 Integer.toString(super.getSequence())
         );
+    }
+
+    public boolean verifyOwner(String address){
+        return this.payerAddress.equals(address) || this.receiverAddress.equals(address);
     }
 }

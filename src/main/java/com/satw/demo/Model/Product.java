@@ -89,58 +89,24 @@ public class Product{
     }
 
     //Getter Setter
-    public int getId(){
-        return id;
-    }
-    public User getSeller(){
-        return seller;
-    }
-    public String getTitle(){
-        return title;
-    }
-    public void setTitle(String title){
-        this.title = title;
-    }
-    public String getDescription(){
-        return description;
-    }
-    public void setDescription(String description){
-        this.description = description;
-    }
-    public int getPrice(){
-        return price;
-    }
-    public void setPrice(int price){
-        this.price = price;
-    }
-    public String getImgs(){
-        return imgs;
-    }
-    public void setImgs(String imgs){
-        this.imgs = imgs;
-    }
-    public int getStockQty(){
-        return stockQty;
-    }
-    public void setStockQty(int stockQty){
-        this.stockQty = stockQty;
-    }
-    public boolean getDeleted(){
-        return deleted;
-    }
-    public void setDeleted(boolean deleted){
-        this.deleted = deleted;
-    }
+    public int getId(){ return id; }
+    public User getSeller(){ return seller; }
+    public String getTitle(){ return title; }
+    public void setTitle(String title){ this.title = title; }
+    public String getDescription(){ return description; }
+    public void setDescription(String description){ this.description = description; }
+    public int getPrice(){ return price; }
+    public void setPrice(int price){ this.price = price; }
+    public String getImgs(){ return imgs; }
+    public void setImgs(String imgs){ this.imgs = imgs; }
+    public int getStockQty(){ return stockQty; }
+    public void setStockQty(int stockQty){ this.stockQty = stockQty; }
+    public boolean getDeleted(){ return deleted; }
+    public void setDeleted(boolean deleted){ this.deleted = deleted; }
 
     //Timestamp Getter Setter
-    public Date getCreateTime(){
-        return createTime;
-    }
-    public Date getUpdateTime(){
-        return updateTime;
-    }
-    
-    //Other DB's Relationships Setter
+    public Date getCreateTime(){ return createTime; }
+    public Date getUpdateTime(){ return updateTime; }
 
     //Operator
     public Order order(User buyer, int quantity, Coupon coupon){
@@ -155,10 +121,6 @@ public class Product{
     }
 
     //Mediator
-    public int getSellerId(){
-        return seller.getId();
-    }
-    public String getSellerWalletAddress(){
-        return seller.getWalletAddress();
-    }
+    public int getSellerId(){ return seller.getId(); }
+    public String getSellerWalletAddress(){ return seller.getWalletAddress(); }
 }

@@ -46,12 +46,11 @@ public class WalletController {
     @GetMapping("wallet/makePayment/{order_id}")
     public String makePayment(@PathVariable int order_id, Model model, HttpSession session, RedirectAttributes attr){
         User user = (User) session.getAttribute("user");
-        List<Order> orders = orderRepository.findById(order_id);
+        Order order = orderRepository.findFirstById(order_id);
         if(user==null){
             attr.addFlashAttribute("alert", new Msg("Error", "Invalid operation!", "error"));
         } else {
-            if(orders.size()>0 && orders.get(0).getBuyer().getId() == user.getId() && orders.get(0).getState() instanceof Ordered){
-                Order order = orders.get(0);
+            if(order!=null && order.getBuyerId() == user.getId() && order.getState() instanceof Ordered){
                 model.addAttribute("order", order);
                 return "makePayment";
             } else {
@@ -67,12 +66,11 @@ public class WalletController {
     public Msg requestPayment(@RequestParam("order_id") int order_id, HttpSession session){
         Msg msg = new Msg();
         User user = (User) session.getAttribute("user");
-        List<Order> orders = orderRepository.findById(order_id);
+        Order order = orderRepository.findFirstById(order_id);
         if(user==null){
             msg = new Msg("Error", "Invalid operation!", "error");
         } else {
-            if(orders.size()>0 && orders.get(0).getBuyer().getId() == user.getId() && orders.get(0).getState() instanceof Ordered){
-                Order order = orders.get(0);
+            if(order!=null && order.getBuyerId() == user.getId() && order.getState() instanceof Ordered){
                 Transaction tx = user.makePayment(order);
                 msg = requestSendOtp(tx, user);
             } else {

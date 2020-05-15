@@ -66,9 +66,9 @@ public class OrderController {
     public String orderDetail(@PathVariable int id, Model model, HttpSession session, RedirectAttributes attr){
         User user = (User) session.getAttribute("user");
         if(user==null) return "redirect:/login?redirect=/myOrders/"+id;
-        List<Order> orders = orderRepository.findById(id);
-        if(orders.size()>0 && (orders.get(0).getBuyer().getId() == user.getId() || orders.get(0).getProductSeller().getId() == user.getId())){
-            model.addAttribute("order", orders.get(0));
+        Order order = orderRepository.findFirstById(id);
+        if(order!=null && (order.getBuyerId() == user.getId() || order.getProductSellerId() == user.getId())){
+            model.addAttribute("order", order);
             return "orderDetail";
         } else {
             Msg msg = new Msg("Error", "Invalid operation!", "error");
@@ -84,13 +84,12 @@ public class OrderController {
     public Msg requestCancelOrder(@RequestParam("id") int id, HttpSession session) {
         Msg msg = new Msg();
         User user = (User) session.getAttribute("user");
-        List<Order> orders = orderRepository.findById(id);
+        Order order = orderRepository.findFirstById(id);
         if(user==null){
             msg = new Msg("Error", "Invalid operation!", "error");
         } else {
-            if(orders.size()>0 && (orders.get(0).getBuyerId() == user.getId() || orders.get(0).getProductSellerId() == user.getId()) && orders.get(0).getState() instanceof Ordered){
-                Order order = orders.get(0);
-                Product product = productRepository.findById(order.getProductId()).get(0);
+            if(order!=null && (order.getBuyerId() == user.getId() || order.getProductSellerId() == user.getId()) && order.getState() instanceof Ordered){
+                Product product = productRepository.findFirstByIdAndDeleted(order.getProductId(), false);
                 product.addStockQty(order.getQuantity());
                 productRepository.saveAndFlush(product);
                 order.setState(new Canceled());
@@ -109,16 +108,15 @@ public class OrderController {
     public Msg requestReceiveOrder(@RequestParam("id") int id, HttpSession session) {
         Msg msg = new Msg();
         User user = (User) session.getAttribute("user");
-        List<Order> orders = orderRepository.findById(id);
+        Order order = orderRepository.findFirstById(id);
         if(user==null){
             msg = new Msg("Error", "Invalid operation!", "error");
         } else {
-            if(orders.size()>0 && orders.get(0).getBuyer().getId() == user.getId() && orders.get(0).getState() instanceof Shipped){
-                Order order = orders.get(0);
+            if(order!=null && order.getBuyerId() == user.getId() && order.getState() instanceof Shipped){
                 User thirdParty = Blockchain.getThirdParty();
                 //第三方補差額
                 while(thirdParty.getWalletBalance()<order.getAmount()){
-                    Transaction tx = thirdParty.makeDeposit(order.getAmount()-thirdParty.getWalletBalance());
+                    Transaction tx = thirdParty.makeDeposit(order.getAmount() - thirdParty.getWalletBalance());
                     Blockchain.addUnveriedTransaction(tx);
                 }
                 //第三方轉移Coins
@@ -142,8 +140,7 @@ public class OrderController {
         ServletRequestAttributes attr = (ServletRequestAttributes) RequestContextHolder.currentRequestAttributes();
         HttpSession session = attr.getRequest().getSession();
         User user = (User) session.getAttribute("user");
-        List<Order> orders = orderRepository.findById(id);
-        Order order = orders.get(0);
+        Order order = orderRepository.findFirstById(id);
         msg = order.updateState(this, user);
         orderRepository.saveAndFlush(order);
         return msg;

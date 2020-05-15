@@ -46,33 +46,13 @@ public class Notification {
     }
 
     //Getter Setter
-    public int getId(){
-        return id;
-    }
-    public String getUserWalletAddress(){
-        return userWalletAddress;
-    }
-    public String getTxHash(){
-        return txHash;
-    }
-    public int getOrderId(){
-        return orderId;
-    }
-    public String getType(){
-        return type;
-    }
-    public String getTitle(){
-        return title;
-    }
-    public String getDescription(){
-        return description;
-    }
-    public boolean getReaded(){
-        return readed;
-    }
-    public void setReaded(boolean readed){
-        this.readed = readed;
-    }
-
-    //Operator
+    public int getId(){ return id; }
+    public String getUserWalletAddress(){ return userWalletAddress; }
+    public String getTxHash(){ return txHash; }
+    public int getOrderId(){ return orderId; }
+    public String getType(){ return type; }
+    public String getTitle(){ return title; }
+    public String getDescription(){ return description; }
+    public boolean getReaded(){ return readed; }
+    public void hasReaded(){ this.readed = true; }
 }

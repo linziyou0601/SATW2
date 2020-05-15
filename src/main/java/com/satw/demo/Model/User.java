@@ -63,24 +63,14 @@ public class User{
     }
 
     //Getter Setter
-    public int getId(){
-        return id;
-    }
-    public String getAccount(){
-        return account;
-    }
-    public String getPassword(){
-        return password;
-    }
+    public int getId(){ return id; }
+    public String getAccount(){ return account; }
+    public String getPassword(){ return password; }
     public void setPassword(String password){
         this.password = BCrypt.with(BCrypt.Version.VERSION_2Y).hashToString(10, password.toCharArray());
     }
-    public Profile getProfile(){
-        return profile;
-    }
-    public Wallet getWallet(){
-        return wallet;
-    }
+    public Profile getProfile(){ return profile; }
+    public Wallet getWallet(){ return wallet; }
 
     //Operator
     public boolean verifyPassword(String password){
@@ -95,37 +85,17 @@ public class User{
     }
     
     //Mediator
-    public String getProfileName(){
-        return profile.getName();
-    }
-    public String getProfileAddress(){
-        return profile.getAddress();
-    }
-    public String getProfileEmail(){
-        return profile.getEmail();
-    }
-    public String getWalletPublicKey(){
-        return wallet.getPublicKey();
-    }
-    public String getWalletPrivateKey(){
-        return wallet.getPrivateKey();
-    }
-    public String getWalletAddress(){
-        return wallet.getAddress();
-    }
-    public int getWalletBalance(){
-        return wallet.getBalance();
-    }
-    public LinkedList<Transaction> getWalletDetail(){
-        return wallet.getDetail();
-    }
-    public Transaction makeDeposit(int amount){
-        return wallet.deposit(amount);
-    }
-    public Transaction makeWithdraw(int amount){
-        return wallet.withdraw(amount);
-    }
-    public Transaction makePayment(Order order){
-        return wallet.payment(order);
-    }
+    public String getProfileName(){ return profile.getName(); }
+    public String getProfileAddress(){ return profile.getAddress(); }
+    public String getProfileEmail(){ return profile.getEmail(); }
+    //-
+    public String getWalletPublicKey(){ return wallet.getPublicKey(); }
+    public String getWalletPrivateKey(){ return wallet.getPrivateKey(); }
+    public String getWalletAddress(){ return wallet.getAddress(); }
+    public int getWalletBalance(){ return wallet.getBalance(); }
+    public LinkedList<Transaction> getWalletDetail(){ return wallet.getDetail(); }
+    //-
+    public Transaction makeDeposit(int amount){ return wallet.deposit(amount); }
+    public Transaction makeWithdraw(int amount){ return wallet.withdraw(amount); }
+    public Transaction makePayment(Order order){ return wallet.payment(order); }
 }

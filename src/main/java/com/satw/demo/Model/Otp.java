@@ -15,6 +15,7 @@ public class Otp {
     private long expiredTime;
     private int retryTimes;
     private String email;
+    
     public Otp(String email){
         this.otp = StringUtil.generateOtp();
         this.expiredTime = Instant.now().getEpochSecond() + 300;

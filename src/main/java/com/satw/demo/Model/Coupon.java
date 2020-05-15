@@ -44,23 +44,11 @@ public class Coupon {
     }
 
     //Getter Setter
-    public int getId(){
-        return id;
-    }
-    public String getCode(){
-        return code;
-    }
-    public int getDiscount(){
-        return discount;
-    }
-    public boolean getAvailable(){
-        return order == null;
-    }
+    public int getId(){ return id; }
+    public String getCode(){ return code; }
+    public int getDiscount(){ return discount; }
+    public boolean getAvailable(){ return order == null; }
 
     //Other DB's Relationships Setter
-    public void setOrder(Order order){
-        this.order = order;
-    }
-
-    //Operator
+    public void setOrder(Order order){ this.order = order; }
 }

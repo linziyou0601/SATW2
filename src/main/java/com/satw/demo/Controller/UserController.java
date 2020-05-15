@@ -95,9 +95,8 @@ public class UserController {
         if(redirect.equals("")) redirect = "/";
         if(session.getAttribute("user")!=null) return "redirect:"+redirect;
         Msg msg = new Msg();
-        List<User> users = userRepository.findByAccount(account);
-        if(users.size()>0){
-            User user = users.get(0);
+        User user = userRepository.findFirstByAccount(account);
+        if(user!=null){
             if(user.verifyPassword(password)){
                 session.setAttribute("user", user);
                 Blockchain.updateChain();
@@ -116,12 +115,5 @@ public class UserController {
         session.removeAttribute("user");
         session.invalidate();
         return "redirect:/login";
-    }
-
-    //-------------------取得第三方使用者-------------------//
-    //Mediator
-    public User getThirdParty(){
-        List<User> users = userRepository.findById(1);
-        return users.get(0);
     }
 }

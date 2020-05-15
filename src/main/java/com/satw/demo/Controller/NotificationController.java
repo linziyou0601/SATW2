@@ -52,11 +52,10 @@ public class NotificationController {
     @PostMapping("readNotification")
     @ResponseBody
     public void readNotification(@RequestBody Map<String,String> reqMap) {
-        List<Notification> notifications = notificationRepository.findById(Integer.parseInt(reqMap.get("id")));
-        if(notifications.size()>0){
-            Notification notification = notifications.get(0);
+        Notification notification = notificationRepository.findFirstById(Integer.parseInt(reqMap.get("id")));
+        if(notification!=null){
             if(notification.getReaded()==false)
-                notification.setReaded(true);
+                notification.hasReaded();
             notificationRepository.saveAndFlush(notification);
         }
     }

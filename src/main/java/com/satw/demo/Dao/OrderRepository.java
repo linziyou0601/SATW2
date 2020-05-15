@@ -13,6 +13,7 @@ import org.springframework.data.repository.query.Param;
 public interface OrderRepository  extends JpaRepository<Order, Long>{
 	List<Order> findAll();
 	List<Order> findById(int id);
+	Order findFirstById(int id);
 	List<Order> findByProduct(Product product);
 	List<Order> findByBuyer(User buyer);
 	@Query("select o from Order o join o.product p where o.buyer = :user or p.seller = :user")
