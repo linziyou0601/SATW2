@@ -66,8 +66,10 @@ public class ProductController {
     //-------------------產品下訂-------------------//
     @PostMapping("requestOrder")
     @ResponseBody
-    public Msg requestOrder(@RequestParam("id") int id,  @RequestParam("quantity") int quantity, 
-                            @RequestParam("couponCode") String couponCode,  HttpSession session) {
+    public Msg requestOrder(@RequestParam("id") int id, 
+                            @RequestParam("quantity") int quantity, 
+                            @RequestParam("couponCode") String couponCode, 
+                            HttpSession session) {
         User user = (User) session.getAttribute("user");
         Product product = productRepository.findFirstByIdAndDeleted(id, false);
         if(user==null){
@@ -76,9 +78,11 @@ public class ProductController {
             Coupon coupon = null;
             if(!couponCode.equals("")){
                 coupon = couponRepository.findFirstByCode(couponCode);
-                if(coupon!=null && !coupon.getAvailable()){
-                    coupon = null;
-                    return new Msg("Failed", "Coupon is unavailable!", "warning");
+                if(coupon!=null){
+                    if(!coupon.getAvailable()){
+                        coupon = null;
+                        return new Msg("Failed", "Coupon is unavailable!", "warning");
+                    }
                 } else {
                     return new Msg("Failed", "Invalid Coupon code!", "warning");
                 }
