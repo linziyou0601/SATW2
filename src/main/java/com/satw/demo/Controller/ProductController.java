@@ -77,9 +77,8 @@ public class ProductController {
         } else {
             Coupon coupon = null;
             if(!couponCode.equals("")){
-                List<Coupon> coupons = couponRepository.findByCode(couponCode);
-                if(coupons.size()>0){
-                    coupon = coupons.get(0);
+                coupon = couponRepository.findFirstByCode(couponCode);
+                if(coupon!=null){
                     if(!coupon.getAvailable()){
                         coupon = null;
                         return new Msg("Failed", "Coupon is unavailable!", "warning");
