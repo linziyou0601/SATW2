@@ -40,6 +40,7 @@ public class ManageProductController {
     DataSource dataSource;
 
     String UPLOADED_FOLDER = System.getProperty("user.home") + File.separator + "uploads";
+    String DEFAULT_IMGS = "/uploads/product_img.png";
 
     //---------------------------------------我的產品---------------------------------------//
     //-------------------我的產品-------------------//
@@ -83,21 +84,9 @@ public class ManageProductController {
                     product = productRepository.saveAndFlush(product);
 
                     //上傳圖片
-                    String imgs = "/uploads/product_img.png";
+                    String imgs = DEFAULT_IMGS;
                     if (!files.isEmpty()) {
-                        try {
-                            File file = new File(UPLOADED_FOLDER);
-                            String extension = FilenameUtils.getExtension(files.getOriginalFilename());
-                            Path path = Paths.get(file.getAbsolutePath() + File.separator + product.getId() + '.' + extension);
-                            System.out.println(path);
-                            byte[] bytes = files.getBytes();
-                            OutputStream os = Files.newOutputStream(path);
-                            os.write(bytes);
-                            imgs = "/uploads/" + product.getId() + '.' + extension;
-                            Files.write(path, bytes);
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
+                        imgs = uploadImages(files, product.getId());
                     }
                     product.setImgs(imgs);
                     productRepository.saveAndFlush(product);
@@ -108,6 +97,25 @@ public class ManageProductController {
             }
         }
         return msg;
+    }
+
+    public String uploadImages(MultipartFile files, int product_id){
+        String imgs = DEFAULT_IMGS;
+        try {
+            File file = new File(UPLOADED_FOLDER);
+            String extension = FilenameUtils.getExtension(files.getOriginalFilename());
+            Path path = Paths.get(file.getAbsolutePath() + File.separator + product_id + '.' + extension);
+            System.out.println(path);
+
+            byte[] bytes = files.getBytes();
+            OutputStream os = Files.newOutputStream(path);
+            os.write(bytes);
+            imgs = "/uploads/" + product_id + '.' + extension;
+            Files.write(path, bytes);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return imgs;
     }
 
     //-------------------產品編輯-------------------//
