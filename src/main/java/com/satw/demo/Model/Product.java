@@ -109,10 +109,6 @@ public class Product{
     public Date getUpdateTime(){ return updateTime; }
 
     //Operator
-    public Order order(User buyer, int quantity, Coupon coupon){
-        Order order = new Order(this, buyer, quantity, coupon);
-        return order;
-    }
     public void minusStockQty(int quantity){
         this.stockQty -= quantity;
     }

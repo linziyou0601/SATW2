@@ -90,7 +90,7 @@ public class ProductController {
             if(product!=null){
                 if(product.getStockQty()>0){
                     if(quantity>0){
-                        Order order = product.order(user, quantity, coupon);    //建立訂單
+                        Order order = new Order(product, user, quantity, coupon);//建立訂單
                         if(coupon!=null) coupon.setOrder(order);                //建立與Order的關聯
                         order = orderRepository.saveAndFlush(order);            //儲存訂單
                         product.minusStockQty(quantity);                        //減少庫存
