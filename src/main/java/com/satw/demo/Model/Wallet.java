@@ -77,6 +77,8 @@ public class Wallet{
     public void setUser(User user){ this.user = user; }
 
     //Operator
+    public int getBalance(){ return blockchain.getBalance(address); }
+    public LinkedList<Transaction> getTransactions(){ return blockchain.getTransactions(address); }
     public Transaction deposit(int amount){
         Transaction transaction = new Deposit(publicKey, address, amount);
         transaction.generateSignature(privateKey);

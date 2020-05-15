@@ -98,8 +98,8 @@ public class User{
     public String getWalletPublicKey(){ return wallet.getPublicKey(); }
     public String getWalletPrivateKey(){ return wallet.getPrivateKey(); }
     public String getWalletAddress(){ return wallet.getAddress(); }
-    public int getWalletBalance(){ return blockchain .getBalance(wallet.getAddress()); }
-    public LinkedList<Transaction> getWalletTransactions(){ return blockchain.getTransactions(wallet.getAddress()); }
+    public int getWalletBalance(){ return wallet.getBalance(); }
+    public LinkedList<Transaction> getWalletTransactions(){ return wallet.getTransactions(); }
     //-
     public Transaction makeDeposit(int amount){ return wallet.deposit(amount); }
     public Transaction makeWithdraw(int amount){ return wallet.withdraw(amount); }
