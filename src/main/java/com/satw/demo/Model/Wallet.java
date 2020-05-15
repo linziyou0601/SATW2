@@ -74,9 +74,6 @@ public class Wallet{
     public void setUser(User user){ this.user = user; }
 
     //Operator
-    public int getBalance(){
-        return Blockchain.getBalance(address);
-    }
     public LinkedList<Transaction> getDetail(){
         LinkedList<Transaction> txs = new LinkedList<>();
         for(Block block: Blockchain.getChain())
@@ -93,7 +90,8 @@ public class Wallet{
     }
     public Transaction withdraw(int amount){
         //驗證餘額是否足夠本次交易
-        if(getBalance() >= amount){
+        int balance = Blockchain.getBalance(address);
+        if(balance >= amount){
             LinkedList<TransactionInput> inputs = Blockchain.getTxInputs(address, amount);
             Transaction transaction = new Withdraw(publicKey, address, amount, inputs);
             transaction.generateSignature(privateKey);
@@ -106,7 +104,8 @@ public class Wallet{
         int amount = order.getState() instanceof Ordered? order.getPayableAmount(): order.getAmount();
 
         //驗證餘額是否足夠本次交易
-        if(getBalance() >= amount){
+        int balance = Blockchain.getBalance(address);
+        if(balance >= amount){
             LinkedList<TransactionInput> inputs = Blockchain.getTxInputs(address, amount);
             String detail = order.getDetail();
             Transaction transaction = new Payment(publicKey, address, receiverAddress, order.getId(), detail, amount, inputs);

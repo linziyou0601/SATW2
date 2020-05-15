@@ -15,6 +15,7 @@ import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 import com.google.gson.annotations.Expose;
+import com.satw.demo.Blockchain.Blockchain;
 import com.satw.demo.Blockchain.Transaction;
 
 import at.favre.lib.crypto.bcrypt.BCrypt;
@@ -92,7 +93,7 @@ public class User{
     public String getWalletPublicKey(){ return wallet.getPublicKey(); }
     public String getWalletPrivateKey(){ return wallet.getPrivateKey(); }
     public String getWalletAddress(){ return wallet.getAddress(); }
-    public int getWalletBalance(){ return wallet.getBalance(); }
+    public int getWalletBalance(){ return Blockchain.getBalance(wallet.getAddress()); }
     public LinkedList<Transaction> getWalletDetail(){ return wallet.getDetail(); }
     //-
     public Transaction makeDeposit(int amount){ return wallet.deposit(amount); }
