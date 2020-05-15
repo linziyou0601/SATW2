@@ -131,7 +131,7 @@ public class Order {
         return price * quantity;
     }
     public int getPayableAmount(){
-        int discount = coupon==null? 0: coupon.getDiscount();
+        int discount = getCouponDiscount();
         return Math.max(0, price * quantity - discount);
     }
     public String getDetail(){
