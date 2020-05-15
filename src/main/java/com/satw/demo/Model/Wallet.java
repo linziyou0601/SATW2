@@ -74,15 +74,6 @@ public class Wallet{
     public void setUser(User user){ this.user = user; }
 
     //Operator
-    public LinkedList<Transaction> getDetail(){
-        LinkedList<Transaction> txs = new LinkedList<>();
-        for(Block block: Blockchain.getChain())
-            for(Transaction tx: block.getTransactions())
-                if(tx.verifyOwner(address))
-                    txs.add(tx);
-        Collections.reverse(txs);
-        return txs;
-    }
     public Transaction deposit(int amount){
         Transaction transaction = new Deposit(publicKey, address, amount);
         transaction.generateSignature(privateKey);

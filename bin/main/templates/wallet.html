@@ -61,7 +61,7 @@
 
                     <h2 class="text-center mt-5">Transaction Detail</h2>
                     <hr class="divider my-2">
-                    <div class="row justify-content-center" th:each="tx: ${session.user.getWalletDetail()}">
+                    <div class="row justify-content-center" th:each="tx: ${session.user.getWalletTransactions()}">
                         <div class="col-lg-6 col-md-8" data-toggle="modal" th:data-target="'#TX-'+${tx.hash}">
                             <div class="card o-hidden my-2 rounded shadow-sm border border-light">
                                 <div class="card-body p-0">

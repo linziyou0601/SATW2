@@ -94,7 +94,7 @@ public class User{
     public String getWalletPrivateKey(){ return wallet.getPrivateKey(); }
     public String getWalletAddress(){ return wallet.getAddress(); }
     public int getWalletBalance(){ return Blockchain.getBalance(wallet.getAddress()); }
-    public LinkedList<Transaction> getWalletDetail(){ return wallet.getDetail(); }
+    public LinkedList<Transaction> getWalletTransactions(){ return Blockchain.getTransactions(wallet.getAddress()); }
     //-
     public Transaction makeDeposit(int amount){ return wallet.deposit(amount); }
     public Transaction makeWithdraw(int amount){ return wallet.withdraw(amount); }

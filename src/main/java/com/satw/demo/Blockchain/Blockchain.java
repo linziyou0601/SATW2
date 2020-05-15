@@ -75,6 +75,15 @@ public class Blockchain {
         }
         return inputs;
     }
+    public static LinkedList<Transaction> getTransactions(String address){
+        LinkedList<Transaction> txs = new LinkedList<>();
+        for(Block block: blockchain.chain)
+            for(Transaction tx: block.getTransactions())
+                if(tx.verifyOwner(address))
+                    txs.add(tx);
+        Collections.reverse(txs);
+        return txs;
+    }
 
     // ------------------BLOCKCHAIN------------------
     public static LinkedList<Block> getChain(){ return blockchain.chain; }
