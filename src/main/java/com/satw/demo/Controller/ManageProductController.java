@@ -86,7 +86,7 @@ public class ManageProductController {
                     //上傳圖片
                     String imgs = DEFAULT_IMGS;
                     if (!files.isEmpty()) {
-                        imgs = uploadImages(files, product.getId());
+                        imgs = uploadImages(imgs, files, product.getId());
                     }
                     product.setImgs(imgs);
                     productRepository.saveAndFlush(product);
@@ -97,25 +97,6 @@ public class ManageProductController {
             }
         }
         return msg;
-    }
-
-    public String uploadImages(MultipartFile files, int product_id){
-        String imgs = DEFAULT_IMGS;
-        try {
-            File file = new File(UPLOADED_FOLDER);
-            String extension = FilenameUtils.getExtension(files.getOriginalFilename());
-            Path path = Paths.get(file.getAbsolutePath() + File.separator + product_id + '.' + extension);
-            System.out.println(path);
-
-            byte[] bytes = files.getBytes();
-            OutputStream os = Files.newOutputStream(path);
-            os.write(bytes);
-            imgs = "/uploads/" + product_id + '.' + extension;
-            Files.write(path, bytes);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return imgs;
     }
 
     //-------------------產品編輯-------------------//
@@ -170,27 +151,7 @@ public class ManageProductController {
                         //上傳圖片
                         String imgs = product.getImgs();
                         if (!files.isEmpty()) {
-                            try {
-                                //刪除舊檔
-                                if(!imgs.equals("/uploads/product_img.png")){
-                                    File file = new File(UPLOADED_FOLDER);
-                                    Path fileToDeletePath = Paths.get(file.getAbsolutePath()+File.separator+imgs.substring(9));
-                                    System.out.println(fileToDeletePath);
-                                    Files.delete(fileToDeletePath);
-                                }
-                                //上傳新檔
-                                File file = new File(UPLOADED_FOLDER);
-                                String extension = FilenameUtils.getExtension(files.getOriginalFilename());
-                                Path path = Paths.get(file.getAbsolutePath() + File.separator + product.getId() + '.' + extension);
-                                System.out.println(path);
-                                byte[] bytes = files.getBytes();
-                                OutputStream os = Files.newOutputStream(path);
-                                os.write(bytes);
-                                imgs = "/uploads/" + product.getId() + '.' + extension;
-                                Files.write(path, bytes);
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                            }
+                            imgs = uploadImages(imgs, files, product.getId());
                         }
                         product.setImgs(imgs);
                         productRepository.saveAndFlush(product);
@@ -225,5 +186,33 @@ public class ManageProductController {
             }
         }
         return msg;
+    }
+    
+    //-------------------上傳圖片-------------------//
+    public String uploadImages(String imgs, MultipartFile files, int product_id){
+        try {
+            //刪除舊檔
+            if(!imgs.equals("/uploads/product_img.png")){
+                File file = new File(UPLOADED_FOLDER);
+                Path fileToDeletePath = Paths.get(file.getAbsolutePath()+File.separator+imgs.substring(9));
+                System.out.println(fileToDeletePath);
+                Files.delete(fileToDeletePath);
+            }
+            
+            //上傳新檔
+            File file = new File(UPLOADED_FOLDER);
+            String extension = FilenameUtils.getExtension(files.getOriginalFilename());
+            Path path = Paths.get(file.getAbsolutePath() + File.separator + product_id + '.' + extension);
+            System.out.println(path);
+
+            byte[] bytes = files.getBytes();
+            OutputStream os = Files.newOutputStream(path);
+            os.write(bytes);
+            imgs = "/uploads/" + product_id + '.' + extension;
+            Files.write(path, bytes);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return imgs;
     }
 }
