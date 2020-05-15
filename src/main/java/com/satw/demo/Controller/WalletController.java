@@ -1,7 +1,5 @@
 package com.satw.demo.Controller;
 
-import java.util.List;
-
 import javax.servlet.http.HttpSession;
 import javax.sql.DataSource;
 

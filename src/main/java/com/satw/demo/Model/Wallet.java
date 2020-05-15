@@ -27,7 +27,6 @@ import com.satw.demo.Blockchain.Deposit;
 import com.satw.demo.Blockchain.Payment;
 import com.satw.demo.Blockchain.Transaction;
 import com.satw.demo.Blockchain.TransactionInput;
-import com.satw.demo.Blockchain.TransactionOutput;
 import com.satw.demo.Blockchain.Withdraw;
 
 @Entity
