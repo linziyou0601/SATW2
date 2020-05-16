@@ -6,11 +6,11 @@ import javax.sql.DataSource;
 import com.satw.demo.Blockchain.Blockchain;
 import com.satw.demo.Blockchain.Transaction;
 import com.satw.demo.Dao.OrderRepository;
-import com.satw.demo.Model.Msg;
 import com.satw.demo.Model.Order;
 import com.satw.demo.Model.Ordered;
-import com.satw.demo.Model.Otp;
 import com.satw.demo.Model.User;
+import com.satw.demo.Normal.Otp;
+import com.satw.demo.Normal.Msg;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;

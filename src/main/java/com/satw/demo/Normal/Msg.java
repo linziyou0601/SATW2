@@ -1,4 +1,4 @@
-package com.satw.demo.Model;
+package com.satw.demo.Normal;
 
 public class Msg {
     public String title = "";

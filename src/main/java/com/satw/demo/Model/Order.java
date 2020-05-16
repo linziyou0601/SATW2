@@ -21,8 +21,8 @@ import javax.persistence.TemporalType;
 import javax.persistence.Transient;
 
 import com.google.gson.annotations.Expose;
-import com.satw.demo.Controller.NotificationController;
-import com.satw.demo.Controller.OrderController;
+import com.satw.demo.Normal.CreateNotifyLambda;
+import com.satw.demo.Normal.Msg;
 
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
@@ -124,8 +124,8 @@ public class Order {
     }
 
     //Operator
-    public Msg updateState(OrderController orderController, User loginUser) {
-		return state.update(this, orderController, loginUser);
+    public Msg updateState(CreateNotifyLambda<String, String, Integer, String, String, String> createNotifyLambda, User loginUser) {
+		return state.update(this, createNotifyLambda, loginUser);
     }
     public int getAmount(){
         return price * quantity;
@@ -141,11 +141,11 @@ public class Order {
         s += "Payable = " + getPayableAmount();
         return s;
     }
-    public void notifyUnpaidOrder(NotificationController notificationController){
-        notificationController.createNotify(buyer.getWalletAddress(), "", id, "Unpaid Order", "Unpaid Order", getDetail());
+    public void notifyUnpaidOrder(CreateNotifyLambda<String, String, Integer, String, String, String> createNotifyLambda){
+        createNotifyLambda.execute(buyer.getWalletAddress(), "", id, "Unpaid Order", "Unpaid Order", getDetail());
     }
-    public void notifyUnshipOrder(NotificationController notificationController){
-        notificationController.createNotify(getProductSellerWalletAddress(), "", id, "Unship Order", "Unship Order", getDetail());
+    public void notifyUnshipOrder(CreateNotifyLambda<String, String, Integer, String, String, String> createNotifyLambda){
+        createNotifyLambda.execute(getProductSellerWalletAddress(), "", id, "Unship Order", "Unship Order", getDetail());
     }
     public void sendOrderDetail(){}
 

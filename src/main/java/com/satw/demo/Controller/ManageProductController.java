@@ -13,9 +13,9 @@ import javax.servlet.http.HttpSession;
 import javax.sql.DataSource;
 
 import com.satw.demo.Dao.ProductRepository;
-import com.satw.demo.Model.Msg;
 import com.satw.demo.Model.Product;
 import com.satw.demo.Model.User;
+import com.satw.demo.Normal.Msg;
 
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -11,13 +11,14 @@ import com.satw.demo.Blockchain.Transaction;
 import com.satw.demo.Dao.OrderRepository;
 import com.satw.demo.Dao.ProductRepository;
 import com.satw.demo.Dao.UserRepository;
-import com.satw.demo.Model.Msg;
 import com.satw.demo.Model.Canceled;
 import com.satw.demo.Model.Order;
 import com.satw.demo.Model.Ordered;
 import com.satw.demo.Model.Product;
 import com.satw.demo.Model.Shipped;
 import com.satw.demo.Model.User;
+import com.satw.demo.Normal.Msg;
+import com.satw.demo.Normal.CreateNotifyLambda;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -48,6 +49,10 @@ public class OrderController {
 	
 	@Autowired
     DataSource dataSource;
+    
+    CreateNotifyLambda<String, String, Integer, String, String, String> createNotifyLambda = (userWalletAddress, txHash, orderId, type, title, description) -> {
+        notificationController.createNotify(userWalletAddress, txHash, orderId, type, title, description);
+    };
 
     //---------------------------------------我的訂單---------------------------------------//
     //-------------------我的訂單-------------------//
@@ -142,14 +147,8 @@ public class OrderController {
         HttpSession session = attr.getRequest().getSession();
         User user = (User) session.getAttribute("user");
         Order order = orderRepository.findFirstById(id);
-        msg = order.updateState(this, user);
+        msg = order.updateState(createNotifyLambda, user);
         orderRepository.saveAndFlush(order);
         return msg;
-    }
-
-    //-------------------發送訂單通知（已付款未出貨）-------------------//
-    //Mediator
-    public void requestSendUnshipNotify(Order order){
-        order.notifyUnshipOrder(notificationController);
     }
 }

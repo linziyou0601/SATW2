@@ -1,4 +1,4 @@
-package com.satw.demo.Model;
+package com.satw.demo.Normal;
 
 import com.satw.demo.Util.EmailUtil;
 import com.satw.demo.Util.StringUtil;

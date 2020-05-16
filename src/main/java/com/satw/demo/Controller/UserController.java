@@ -8,9 +8,9 @@ import javax.sql.DataSource;
 import com.satw.demo.Blockchain.Blockchain;
 import com.satw.demo.Dao.ProfileRepository;
 import com.satw.demo.Dao.UserRepository;
-import com.satw.demo.Model.Msg;
 import com.satw.demo.Model.Profile;
 import com.satw.demo.Model.User;
+import com.satw.demo.Normal.Msg;
 import com.satw.demo.Util.StringUtil;
 
 import org.springframework.beans.factory.annotation.Autowired;

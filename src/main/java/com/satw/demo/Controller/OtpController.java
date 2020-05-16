@@ -4,10 +4,10 @@ import javax.servlet.http.HttpSession;
 
 import com.satw.demo.Blockchain.Blockchain;
 import com.satw.demo.Blockchain.Transaction;
-import com.satw.demo.Model.Msg;
-import com.satw.demo.Model.Otp;
-import com.satw.demo.Model.Otp.ValidState;
 import com.satw.demo.Model.User;
+import com.satw.demo.Normal.Msg;
+import com.satw.demo.Normal.Otp;
+import com.satw.demo.Normal.Otp.ValidState;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;

@@ -9,10 +9,11 @@ import com.satw.demo.Dao.CouponRepository;
 import com.satw.demo.Dao.OrderRepository;
 import com.satw.demo.Dao.ProductRepository;
 import com.satw.demo.Model.Coupon;
-import com.satw.demo.Model.Msg;
 import com.satw.demo.Model.Order;
 import com.satw.demo.Model.Product;
 import com.satw.demo.Model.User;
+import com.satw.demo.Normal.Msg;
+import com.satw.demo.Normal.CreateNotifyLambda;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -40,6 +41,10 @@ public class ProductController {
 	
 	@Autowired
     DataSource dataSource;
+
+    CreateNotifyLambda<String, String, Integer, String, String, String> createNotifyLambda = (userWalletAddress, txHash, orderId, type, title, description) -> {
+        notificationController.createNotify(userWalletAddress, txHash, orderId, type, title, description);
+    };
     
     //---------------------------------------所有產品---------------------------------------//
     //-------------------所有產品-------------------//
@@ -95,7 +100,7 @@ public class ProductController {
                         order = orderRepository.saveAndFlush(order);            //儲存訂單
                         product.minusStockQty(quantity);                        //減少庫存
                         productRepository.saveAndFlush(product);                //儲存商品
-                        requestSendUnpaidNotify(order);                         //未付款通知
+                        order.notifyUnpaidOrder(createNotifyLambda);;           //未付款通知
                         return new Msg("Successful", Integer.toString(order.getId()), "success");
                     } else {
                         return new Msg("Failed", "Quantity must large than 0.", "warning");
@@ -107,11 +112,5 @@ public class ProductController {
                 return new Msg("Error", "Invalid operation.", "error");
             }
         }
-    }
-    
-    //-------------------發送訂單通知（未付款）-------------------//
-    //Mediator
-    public void requestSendUnpaidNotify(Order order){
-        order.notifyUnpaidOrder(notificationController);
     }
 }
