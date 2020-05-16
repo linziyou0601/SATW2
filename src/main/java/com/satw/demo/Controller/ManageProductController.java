@@ -178,7 +178,7 @@ public class ManageProductController {
         } else {
             //驗證是否可編輯
             if(product!=null && product.getSeller().getId() == user.getId()){
-                product.setDeleted(true);
+                product.doDeleted();
                 productRepository.saveAndFlush(product);
                 msg = new Msg("Successful", "Product is deleted", "success");
             } else {

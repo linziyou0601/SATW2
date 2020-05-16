@@ -102,13 +102,15 @@ public class Product{
     public int getStockQty(){ return stockQty; }
     public void setStockQty(int stockQty){ this.stockQty = stockQty; }
     public boolean getDeleted(){ return deleted; }
-    public void setDeleted(boolean deleted){ this.deleted = deleted; }
 
     //Timestamp Getter Setter
     public Date getCreateTime(){ return createTime; }
     public Date getUpdateTime(){ return updateTime; }
 
     //Operator
+    public void doDeleted(){
+        deleted = true;
+    }
     public void minusStockQty(int quantity){
         this.stockQty -= quantity;
     }
