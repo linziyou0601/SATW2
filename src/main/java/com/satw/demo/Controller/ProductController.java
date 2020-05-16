@@ -6,7 +6,6 @@ import javax.sql.DataSource;
 
 import com.satw.demo.Dao.ProductRepository;
 import com.satw.demo.Model.Product;
-import com.satw.demo.Normal.CreateNotifyLambda;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -27,10 +26,6 @@ public class ProductController {
 	@Autowired
     DataSource dataSource;
 
-    CreateNotifyLambda<String, String, Integer, String, String, String> createNotifyLambda = (userWalletAddress, txHash, orderId, type, title, description) -> {
-        notificationController.createNotify(userWalletAddress, txHash, orderId, type, title, description);
-    };
-    
     //---------------------------------------所有產品---------------------------------------//
     //-------------------所有產品-------------------//
     @GetMapping("products")
