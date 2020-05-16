@@ -13,10 +13,8 @@ import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
-import javax.persistence.Transient;
 
 import com.google.gson.annotations.Expose;
-import com.satw.demo.Blockchain.Blockchain;
 import com.satw.demo.Blockchain.Transaction;
 
 import at.favre.lib.crypto.bcrypt.BCrypt;
@@ -48,10 +46,6 @@ public class User{
     private Set<Product> products;
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, mappedBy = "buyer")
     private Set<Order> orders;
-
-    //ACCESS POINT OF SINGLETON BLOCKCHAIN INSTANCE
-    @Transient
-    Blockchain blockchain = Blockchain.getInstance();
 
     //------------------------------------Method------------------------------------
     //Constructor

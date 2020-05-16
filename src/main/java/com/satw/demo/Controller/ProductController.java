@@ -2,17 +2,10 @@ package com.satw.demo.Controller;
 
 import java.util.List;
 
-import javax.servlet.http.HttpSession;
 import javax.sql.DataSource;
 
-import com.satw.demo.Dao.CouponRepository;
-import com.satw.demo.Dao.OrderRepository;
 import com.satw.demo.Dao.ProductRepository;
-import com.satw.demo.Model.Coupon;
-import com.satw.demo.Model.Order;
 import com.satw.demo.Model.Product;
-import com.satw.demo.Model.User;
-import com.satw.demo.Normal.Msg;
 import com.satw.demo.Normal.CreateNotifyLambda;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,24 +13,16 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
 
 @Controller
 public class ProductController {
 
     @Autowired
     NotificationController notificationController;
-    
-    @Autowired
-    CouponRepository couponRepository;
 
     @Autowired
     ProductRepository productRepository;
-    
-    @Autowired
-	OrderRepository orderRepository;
 	
 	@Autowired
     DataSource dataSource;
@@ -65,52 +50,6 @@ public class ProductController {
             return "productDetail";
         } else {
             return "redirect:/products";
-        }
-    }
-    
-    //-------------------產品下訂-------------------//
-    @PostMapping("requestOrder")
-    @ResponseBody
-    public Msg requestOrder(@RequestParam("id") int id, 
-                            @RequestParam("quantity") int quantity, 
-                            @RequestParam("couponCode") String couponCode, 
-                            HttpSession session) {
-        User user = (User) session.getAttribute("user");
-        Product product = productRepository.findFirstByIdAndDeleted(id, false);
-        if(user==null){
-            return new Msg("Error", "Invalid operation!", "error");
-        } else {
-            Coupon coupon = null;
-            if(!couponCode.equals("")){
-                coupon = couponRepository.findFirstByCode(couponCode);
-                if(coupon!=null){
-                    if(!coupon.getAvailable()){
-                        coupon = null;
-                        return new Msg("Failed", "Coupon is unavailable!", "warning");
-                    }
-                } else {
-                    return new Msg("Failed", "Invalid Coupon code!", "warning");
-                }
-            }
-            if(product!=null){
-                if(product.getStockQty()>0){
-                    if(quantity>0){
-                        Order order = new Order(product, user, quantity, coupon);//建立訂單
-                        if(coupon!=null) coupon.setOrder(order);                //建立與Order的關聯
-                        order = orderRepository.saveAndFlush(order);            //儲存訂單
-                        product.minusStockQty(quantity);                        //減少庫存
-                        productRepository.saveAndFlush(product);                //儲存商品
-                        order.notifyUnpaidOrder(createNotifyLambda);;           //未付款通知
-                        return new Msg("Successful", Integer.toString(order.getId()), "success");
-                    } else {
-                        return new Msg("Failed", "Quantity must large than 0.", "warning");
-                    }
-                } else {
-                    return new Msg("Failed", "Product unavailable!", "warning");
-                }
-            } else {
-                return new Msg("Error", "Invalid operation.", "error");
-            }
         }
     }
 }

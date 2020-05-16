@@ -8,10 +8,12 @@ import javax.sql.DataSource;
 
 import com.satw.demo.Blockchain.Blockchain;
 import com.satw.demo.Blockchain.Transaction;
+import com.satw.demo.Dao.CouponRepository;
 import com.satw.demo.Dao.OrderRepository;
 import com.satw.demo.Dao.ProductRepository;
 import com.satw.demo.Dao.UserRepository;
 import com.satw.demo.Model.Canceled;
+import com.satw.demo.Model.Coupon;
 import com.satw.demo.Model.Order;
 import com.satw.demo.Model.Ordered;
 import com.satw.demo.Model.Product;
@@ -41,6 +43,9 @@ public class OrderController {
     @Autowired
     UserRepository userRepository;
     
+    @Autowired
+    CouponRepository couponRepository;
+
     @Autowired
     ProductRepository productRepository;
     
@@ -83,6 +88,52 @@ public class OrderController {
     }
 
     //---------------------------------------我的訂單---------------------------------------//
+    //-------------------產品下訂-------------------//
+    @PostMapping("requestOrder")
+    @ResponseBody
+    public Msg requestOrder(@RequestParam("id") int id, 
+                            @RequestParam("quantity") int quantity, 
+                            @RequestParam("couponCode") String couponCode, 
+                            HttpSession session) {
+        User user = (User) session.getAttribute("user");
+        Product product = productRepository.findFirstByIdAndDeleted(id, false);
+        if(user==null){
+            return new Msg("Error", "Invalid operation!", "error");
+        } else {
+            Coupon coupon = null;
+            if(!couponCode.equals("")){
+                coupon = couponRepository.findFirstByCode(couponCode);
+                if(coupon!=null){
+                    if(!coupon.getAvailable()){
+                        coupon = null;
+                        return new Msg("Failed", "Coupon is unavailable!", "warning");
+                    }
+                } else {
+                    return new Msg("Failed", "Invalid Coupon code!", "warning");
+                }
+            }
+            if(product!=null){
+                if(product.getStockQty()>0){
+                    if(quantity>0){
+                        Order order = new Order(product, user, quantity, coupon);//建立訂單
+                        if(coupon!=null) coupon.setOrder(order);                //建立與Order的關聯
+                        order = orderRepository.saveAndFlush(order);            //儲存訂單
+                        product.minusStockQty(quantity);                        //減少庫存
+                        productRepository.saveAndFlush(product);                //儲存商品
+                        order.notifyUnpaidOrder(createNotifyLambda);;           //未付款通知
+                        return new Msg("Successful", Integer.toString(order.getId()), "success");
+                    } else {
+                        return new Msg("Failed", "Quantity must large than 0.", "warning");
+                    }
+                } else {
+                    return new Msg("Failed", "Product unavailable!", "warning");
+                }
+            } else {
+                return new Msg("Error", "Invalid operation.", "error");
+            }
+        }
+    }
+
     //-------------------取消訂單-------------------//
     @PostMapping("requestCancelOrder")
     @ResponseBody
