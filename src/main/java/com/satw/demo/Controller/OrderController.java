@@ -174,11 +174,11 @@ public class OrderController {
                 //第三方補差額
                 while(thirdParty.getWalletBalance()<order.getAmount()){
                     Transaction tx = thirdParty.makeDeposit(order.getAmount() - thirdParty.getWalletBalance());
-                    blockchain.addUnveriedTransaction(tx);
+                    blockchain.addUnverifiedTransaction(tx);
                 }
                 //第三方轉移Coins
                 Transaction tx = thirdParty.makePayment(order);
-                blockchain.addUnveriedTransaction(tx);
+                blockchain.addUnverifiedTransaction(tx);
                 blockchain.updateChain();
                 msg = new Msg("Successful", "Order state has updated.", "success");
             } else {

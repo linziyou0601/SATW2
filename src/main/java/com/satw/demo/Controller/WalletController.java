@@ -117,7 +117,7 @@ public class WalletController {
                 if(amount>0){
                     Transaction tx = user.makeDeposit(amount);
                     if(tx!=null){
-                        blockchain.addUnveriedTransaction(tx);
+                        blockchain.addUnverifiedTransaction(tx);
                         msg = new Msg("Successful", "Your transaction "+tx.getDetail()+" has sent to blockchain", "success");
                     } else {
                         msg = new Msg("Failed", "It has some trubles.", "error");

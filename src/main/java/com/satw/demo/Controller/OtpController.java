@@ -46,7 +46,7 @@ public class OtpController {
                 switch(state){
                     case CORRECT:
                         Transaction tx = (Transaction) session.getAttribute("newTx");
-                        blockchain.addUnveriedTransaction(tx);
+                        blockchain.addUnverifiedTransaction(tx);
                         msg = new Msg("Successful", "Your transaction "+tx.getDetail()+" has sent to blockchain.", "success");
                         session.removeAttribute("newTx");
                         session.removeAttribute("otp");

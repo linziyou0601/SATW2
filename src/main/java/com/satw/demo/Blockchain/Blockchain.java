@@ -163,7 +163,7 @@ public class Blockchain {
     }
 
     // UNVERIFIED TRANSACTIONS
-    public void addUnveriedTransaction(Transaction newTransacion) {
+    public void addUnverifiedTransaction(Transaction newTransacion) {
         LinkedList<Transaction> unverifiedTransactions = readUnverifiedTransactions();
         unverifiedTransactions.add(newTransacion);
         writeUnverifiedTransactions(unverifiedTransactions);
