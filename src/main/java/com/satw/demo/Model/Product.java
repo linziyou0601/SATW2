@@ -112,7 +112,8 @@ public class Product{
         deleted = true;
     }
     public void minusStockQty(int quantity){
-        this.stockQty -= quantity;
+        if(this.stockQty-quantity>=0)
+            this.stockQty -= quantity;
     }
     public void addStockQty(int quantity){
         this.stockQty += quantity;
