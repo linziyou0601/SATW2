@@ -23,7 +23,7 @@ public class Deposit extends Transaction {
     //-------------------- concrete method --------------------
     public boolean processTransaction() {
         //驗證交易簽名
-        if(super.getSignature()!=null && verifiySignature() == false) {
+        if(super.getSignature()!=null && verifySignature() == false) {
             System.out.println("[x] 交易簽名驗證失敗"); //prompt
             return false;
         }

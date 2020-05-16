@@ -35,7 +35,7 @@ public class Payment extends Transaction {
         //讀入輸入源
         for(TransactionInput input: super.getInputs()) input.processAmount();
         //驗證交易簽名
-        if(super.getSignature()!=null && verifiySignature() == false) {
+        if(super.getSignature()!=null && verifySignature() == false) {
             System.out.println("[x] 交易簽名驗證失敗"); //prompt
             return false;
         }

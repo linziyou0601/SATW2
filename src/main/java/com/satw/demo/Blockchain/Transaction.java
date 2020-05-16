@@ -76,7 +76,7 @@ public abstract class Transaction {
         );
     }
     //verify using public key
-    public boolean verifiySignature() {
+    public boolean verifySignature() {
         String plainData = hashPlainData();
         return KeyPairUtil.verifyECDSASig(
             KeyPairUtil.stringToPublicKey(publicKey),

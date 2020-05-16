@@ -260,7 +260,7 @@ public class Blockchain {
                 if(currentTransaction.getSequence()>=sequence)
                     sequence = currentTransaction.getSequence()+1;
 
-                if(!currentTransaction.verifiySignature()) {
+                if(!currentTransaction.verifySignature()) {
                     System.out.println("[x] 交易(" + currentTransaction.getHash() + ") 的簽章不合法！");   //prompt
                     return false;
                 }
