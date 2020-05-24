@@ -9,13 +9,17 @@ import javax.servlet.http.HttpSession;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import com.satw.demo.Dao.UserRepository;
+import com.satw.demo.Dao.WalletRepository;
 import com.satw.demo.Model.User;
+import com.satw.demo.Model.Wallet;
 
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.conn.ssl.TrustStrategy;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.ssl.SSLContexts;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -30,6 +34,12 @@ import org.springframework.web.client.RestTemplate;
 @Controller
 public class LinebotController {
 
+    @Autowired
+    WalletRepository walletRepository;
+
+    @Autowired
+    UserRepository userRepository;
+    
     //---------------------------------------REST TEMPLATE POST REQUEST---------------------------------------//
     public Map<Object, Object> postRequest(String url, Map<?,?> data){
         try {
@@ -79,5 +89,41 @@ public class LinebotController {
         requestData.put("account", user.getAccount());
         postRequest("https://satw2.linziyou.nctu.me:4567/binding", requestData);
         return "redirect:/linebot/bind/"+channel_id;
+    }
+
+    //---------------------------------------CHATBOT PUSHING---------------------------------------//
+    public void pushing(String title, String content, int order_id, String userWalletAddress){
+        Wallet wallet = walletRepository.findFirstByAddress(userWalletAddress);
+        int userId = wallet.getId();
+        User user = userRepository.findFirstById(userId);
+        String account = user.getAccount();
+        Map<Object, Object> requestData = new HashMap<>();
+        requestData.put("account", account);
+        Map<Object, Object> response = postRequest("https://satw2.linziyou.nctu.me:4567/getChannelId", requestData);
+        String channel_id = (String)response.get("channelId");
+        if(!channel_id.equals("none")){
+            /* {  
+                "type": "flex",
+                "title": "已出貨通知（測試）",
+                "message": {  
+                    "title": "已出貨通知（測試）",
+                    "content": "賣家已將您的商品：「測試測試測試」出貨，請注意查收！",
+                    "order_id": "1"
+                },
+                "channel_id": "U95caa80bb0e6031591886fc6c5c3a686",
+                "template": "announcement"
+            } */
+            requestData = new HashMap<>();
+            requestData.put("type", "flex");
+            requestData.put("title", title);
+            requestData.put("channel_id", channel_id);
+            requestData.put("template", "announcement");
+            Map<Object, Object> messageData = new HashMap<>();
+            messageData.put("title", title);
+            messageData.put("content", content);
+            messageData.put("order_id", order_id);
+            requestData.put("message", messageData);
+            postRequest("https://satw2.linziyou.nctu.me:4567/pushing", requestData);
+        }
     }
 }

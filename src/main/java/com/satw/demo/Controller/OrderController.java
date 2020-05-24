@@ -39,6 +39,9 @@ public class OrderController {
     
     @Autowired
     NotificationController notificationController;
+    
+    @Autowired
+    LinebotController linebotController;
 
     @Autowired
     UserRepository userRepository;
@@ -57,6 +60,9 @@ public class OrderController {
     
     CreateNotifyLambda<String, String, Integer, String, String, String> createNotifyLambda = (userWalletAddress, txHash, orderId, type, title, description) -> {
         notificationController.createNotify(userWalletAddress, txHash, orderId, type, title, description);
+        String lineTitle = type.equals("Unpaid Order")? "您的商品已被下訂": "商品出貨通知";
+        String lineContent = "商品資訊：\n" + description;
+        linebotController.pushing(lineTitle, lineContent, orderId, userWalletAddress);
     };
 
     //---------------------------------------我的訂單---------------------------------------//

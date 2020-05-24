@@ -147,6 +147,9 @@ public class Order {
     public void notifyUnshipOrder(CreateNotifyLambda<String, String, Integer, String, String, String> createNotifyLambda){
         createNotifyLambda.execute(getProductSellerWalletAddress(), "", id, "Unship Order", "Unship Order", getDetail());
     }
+    public void notifyShippedOrder(CreateNotifyLambda<String, String, Integer, String, String, String> createNotifyLambda){
+        createNotifyLambda.execute(buyer.getWalletAddress(), "", id, "Shipped Order", "Shipped Order", getDetail());
+    }
     public void sendOrderDetail(){}
 
     //Mediator

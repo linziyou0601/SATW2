@@ -9,4 +9,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 public interface WalletRepository  extends JpaRepository<Wallet, Long>{
 	List<Wallet> findAll();
 	List<Wallet> findById(int id);
+	Wallet findFirstByAddress(String address);
 }
