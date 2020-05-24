@@ -11,6 +11,7 @@ public class Placed implements State {
             msg = new Msg("Error", "Invalid operation.", "error");
         } else {
 			if(order.getProductSellerId() == loginUser.getId()){
+				order.notifyShippedOrder(createNotifyLambda);   //通知已出貨
 				order.setState(new Shipped());  //狀態更新為已出貨
 				msg = new Msg("Successful", "Order state has updated.", "success");
 			} else {
