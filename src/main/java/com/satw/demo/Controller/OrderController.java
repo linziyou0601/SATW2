@@ -60,7 +60,7 @@ public class OrderController {
     
     CreateNotifyLambda<String, String, Integer, String, String, String> createNotifyLambda = (userWalletAddress, txHash, orderId, type, title, description) -> {
         notificationController.createNotify(userWalletAddress, txHash, orderId, type, title, description);
-        String lineTitle = type.equals("Unpaid Order")? "您的商品已被下訂": "商品出貨通知";
+        String lineTitle = type.equals("Unpaid Order")? "您的訂單尚未付款": type.equals("Unship Order")? "您的商品已被下訂": "你的訂單已出貨";
         String lineContent = "商品資訊：\n" + description;
         linebotController.pushing(lineTitle, lineContent, orderId, userWalletAddress);
     };
