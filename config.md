@@ -189,7 +189,7 @@ Listen 80
 ### 利用 wget 取得 github上 的 SATW2.zip
 
     cd /var/www/html
-    sudo wget -O satw2.zip https://github.com/linziyou0601/SATW2/archive/master.zip
+    sudo wget --no-cache -O satw2.zip https://github.com/linziyou0601/SATW2/archive/master.zip
     sudo unzip satw2.zip
     sudo mv SATW2-master satw2
     sudo chmod 777 -R satw2
@@ -239,7 +239,7 @@ WantedBy=multi-user.target
 
     cd /var/www
     sudo rm -rf satw2bot
-    sudo wget -O satw2bot.zip https://github.com/linziyou0601/SATW2BOT/archive/master.zip
+    sudo wget --no-cache -O satw2bot.zip https://github.com/linziyou0601/SATW2BOT/archive/master.zip
     sudo unzip satw2bot.zip
     sudo mv SATW2BOT-master satw2bot
 
