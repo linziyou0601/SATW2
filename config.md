@@ -39,7 +39,7 @@
 
 ### Host
 
-    Domain: satw2.linziyou.nctu.me
+    Domain: satw2.linziyou.info
     IP Address: {ON-GOOGLE-DHCP}
 
 ### Ports
@@ -95,18 +95,18 @@ Listen 80
 #root
 <VirtualHost *:7777>
         SSLEngine On
-        SSLCertificateFile /etc/letsencrypt/live/satw2.linziyou.nctu.me/cert.pem
-        SSLCertificateKeyFile /etc/letsencrypt/live/satw2.linziyou.nctu.me/privkey.pem
-        SSLCertificateChainFile /etc/letsencrypt/live/satw2.linziyou.nctu.me/fullchain.pem
+        SSLCertificateFile /etc/letsencrypt/live/satw2.linziyou.info/cert.pem
+        SSLCertificateKeyFile /etc/letsencrypt/live/satw2.linziyou.info/privkey.pem
+        SSLCertificateChainFile /etc/letsencrypt/live/satw2.linziyou.info/fullchain.pem
         DocumentRoot /root
 </VirtualHost>
 
 #phpmyadmin
 <VirtualHost *:8888>
         SSLEngine On
-        SSLCertificateFile /etc/letsencrypt/live/satw2.linziyou.nctu.me/cert.pem
-        SSLCertificateKeyFile /etc/letsencrypt/live/satw2.linziyou.nctu.me/privkey.pem
-        SSLCertificateChainFile /etc/letsencrypt/live/satw2.linziyou.nctu.me/fullchain.pem
+        SSLCertificateFile /etc/letsencrypt/live/satw2.linziyou.info/cert.pem
+        SSLCertificateKeyFile /etc/letsencrypt/live/satw2.linziyou.info/privkey.pem
+        SSLCertificateChainFile /etc/letsencrypt/live/satw2.linziyou.info/fullchain.pem
         Alias /phpmyadmin /usr/share/phpmyadmin
 </VirtualHost>
 
@@ -114,12 +114,12 @@ Listen 80
 <VirtualHost *:443>
     SSLEngine On
         # SSL
-        SSLCertificateFile /etc/letsencrypt/live/satw2.linziyou.nctu.me/cert.pem
-        SSLCertificateKeyFile /etc/letsencrypt/live/satw2.linziyou.nctu.me/privkey.pem
-        SSLCertificateChainFile /etc/letsencrypt/live/satw2.linziyou.nctu.me/fullchain.pem
+        SSLCertificateFile /etc/letsencrypt/live/satw2.linziyou.info/cert.pem
+        SSLCertificateKeyFile /etc/letsencrypt/live/satw2.linziyou.info/privkey.pem
+        SSLCertificateChainFile /etc/letsencrypt/live/satw2.linziyou.info/fullchain.pem
         # 網站設定
-        ServerName satw2.linziyou.nctu.me
-        ServerAlias satw2.linziyou.nctu.me
+        ServerName satw2.linziyou.info
+        ServerAlias satw2.linziyou.info
         # 網站日誌
         ErrorLog ${APACHE_LOG_DIR}/error.log
         CustomLog ${APACHE_LOG_DIR}/access.log combined
@@ -136,11 +136,11 @@ Listen 80
 <VirtualHost *:4567>
     # 開啟SSL
     SSLEngine On
-    SSLCertificateFile /etc/letsencrypt/live/satw2.linziyou.nctu.me/cert.pem
-    SSLCertificateKeyFile /etc/letsencrypt/live/satw2.linziyou.nctu.me/privkey.pem
-    SSLCertificateChainFile /etc/letsencrypt/live/satw2.linziyou.nctu.me/fullchain.pem
-    ServerName satw2.linziyou.nctu.me:4567
-    ServerAlias satw2.linziyou.nctu.me
+    SSLCertificateFile /etc/letsencrypt/live/satw2.linziyou.info/cert.pem
+    SSLCertificateKeyFile /etc/letsencrypt/live/satw2.linziyou.info/privkey.pem
+    SSLCertificateChainFile /etc/letsencrypt/live/satw2.linziyou.info/fullchain.pem
+    ServerName satw2.linziyou.info:4567
+    ServerAlias satw2.linziyou.info
     # 代理設定
     ProxyPass / unix:/var/www/satw2bot/uwsgi/uwsgi.sock|uwsgi://127.0.0.1:5000/
 </VirtualHost>
