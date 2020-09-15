@@ -69,7 +69,7 @@ public class LinebotController {
     public String bind(@PathVariable String channel_id, Model model){
         Map<Object, Object> requestData = new HashMap<>();
         requestData.put("channel_id", channel_id);
-        Map<Object, Object> response = postRequest("https://satw2.linziyou.nctu.me:4567/getChannelBind", requestData);
+        Map<Object, Object> response = postRequest("https://satw2.linziyou.info:4567/getChannelBind", requestData);
         
         String[] tint_ary = {"帳號不存在", "未綁定", "已完成綁定", "群組不可綁定"};
         String[] class_ary = {"text-danger", "text-danger", "", "text-danger"};
@@ -87,7 +87,7 @@ public class LinebotController {
         Map<Object, Object> requestData = new HashMap<>();
         requestData.put("channel_id", channel_id);
         requestData.put("account", user.getAccount());
-        postRequest("https://satw2.linziyou.nctu.me:4567/binding", requestData);
+        postRequest("https://satw2.linziyou.info:4567/binding", requestData);
         return "redirect:/linebot/bind/"+channel_id;
     }
 
@@ -99,7 +99,7 @@ public class LinebotController {
         String account = user.getAccount();
         Map<Object, Object> requestData = new HashMap<>();
         requestData.put("account", account);
-        Map<Object, Object> response = postRequest("https://satw2.linziyou.nctu.me:4567/getChannelId", requestData);
+        Map<Object, Object> response = postRequest("https://satw2.linziyou.info:4567/getChannelId", requestData);
         String channel_id = (String)response.get("channelId");
         if(!channel_id.equals("none")){
             /* {  
@@ -123,7 +123,7 @@ public class LinebotController {
             messageData.put("content", content);
             messageData.put("order_id", order_id);
             requestData.put("message", messageData);
-            postRequest("https://satw2.linziyou.nctu.me:4567/pushing", requestData);
+            postRequest("https://satw2.linziyou.info:4567/pushing", requestData);
         }
     }
 }
