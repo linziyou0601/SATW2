@@ -16,8 +16,8 @@ public class EmailUtil {
         boolean result = false;
         String host = "smtp.gmail.com";
         int port = 587;
-        final String username = "b10723007@gemail.yuntech.edu.tw";
-        final String password = "Mm552288369";
+        final String username = "<domain>@gmail.com";
+        final String password = "<passowrd>";
       
         Properties props = new Properties();
         props.put("mail.smtp.host", host);
